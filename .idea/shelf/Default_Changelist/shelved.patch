@@ -1,0 +1,3230 @@
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># spring-oauth2-template\r\nTemplate project with spring oauth2 and angular \r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision a52e308a5a350f4a82656b4e809dfe3332f56104)
++++ b/README.md	(date 1607199081863)
+@@ -1,2 +1,40 @@
+ # spring-oauth2-template
+ Template project with spring oauth2 and angular 
++
++# spring-reddit-clone
++Reddit clone built using Spring Boot, Spring Security with JPA Authentication, Spring Data JPA with MySQL, Spring MVC. The frontend is built using Angular - You can find the frontend source code here - https://github.com/SaiUpadhyayula/angular-reddit-clone
++
++# NOTE
++This source code is used as a starting point for my other tutorials which shows how to deploy the Spring Boot and Angular app to Heroku and Testing Spring boot applications:
++
++The complete source code for the ![Deploy Spring Boot and Angular to Heroku](https://www.youtube.com/watch?v=y_idn12FB18&t=8s) can be found at https://github.com/SaiUpadhyayula/spring-reddit-clone-heroku-deployment
++
++The complete source code for the ![Testing Spring Boot Applications](https://youtu.be/--nQfs67zCM) can be found at https://github.com/SaiUpadhyayula/spring-boot-testing-reddit-clone
++
++# Tutorial
++https://programmingtechie.com/2019/09/30/build-a-full-stack-reddit-clone-with-spring-boot-and-angular-part-1/
++
++# Front end code
++https://github.com/SaiUpadhyayula/angular-reddit-clone
++
++# Screenshots
++1. Home Page
++
++![Home Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/reddit-screenshot-updated.PNG)
++
++2. View Post Page
++
++![View Post Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/reddit-screenshot-updated.PNG)
++
++3. Create Post Page
++
++![Create Post Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/create-post.PNG)
++
++4. Create Subreddit Page
++
++![Create Subreddit Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/create-subreddit.PNG)
++
++5. User Profile Page
++
++![User Profile Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/user-profile.PNG)
++
+Index: src/main/java/com/programming/techie/springredditclone/service/SubredditService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/SubredditService.java b/src/main/java/com/programming/techie/springredditclone/service/SubredditService.java
+new file mode 100644
+--- /dev/null	(date 1606709435820)
++++ b/src/main/java/com/programming/techie/springredditclone/service/SubredditService.java	(date 1606709435820)
+@@ -0,0 +1,45 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.dto.SubredditDto;
++import com.programming.techie.springredditclone.exceptions.SpringRedditException;
++import com.programming.techie.springredditclone.mapper.SubredditMapper;
++import com.programming.techie.springredditclone.model.Subreddit;
++import com.programming.techie.springredditclone.repository.SubredditRepository;
++import lombok.AllArgsConstructor;
++import lombok.extern.slf4j.Slf4j;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.util.List;
++
++import static java.util.stream.Collectors.toList;
++
++@Service
++@AllArgsConstructor
++@Slf4j
++public class SubredditService {
++
++    private final SubredditRepository subredditRepository;
++    private final SubredditMapper subredditMapper;
++
++    @Transactional
++    public SubredditDto save(SubredditDto subredditDto) {
++        Subreddit save = subredditRepository.save(subredditMapper.mapDtoToSubreddit(subredditDto));
++        subredditDto.setId(save.getId());
++        return subredditDto;
++    }
++
++    @Transactional(readOnly = true)
++    public List<SubredditDto> getAll() {
++        return subredditRepository.findAll()
++                .stream()
++                .map(subredditMapper::mapSubredditToDto)
++                .collect(toList());
++    }
++
++    public SubredditDto getSubreddit(Long id) {
++        Subreddit subreddit = subredditRepository.findById(id)
++                .orElseThrow(() -> new SpringRedditException("No subreddit found with ID - " + id));
++        return subredditMapper.mapSubredditToDto(subreddit);
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/service/RefreshTokenService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/RefreshTokenService.java b/src/main/java/com/programming/techie/springredditclone/service/RefreshTokenService.java
+new file mode 100644
+--- /dev/null	(date 1606709435819)
++++ b/src/main/java/com/programming/techie/springredditclone/service/RefreshTokenService.java	(date 1606709435819)
+@@ -0,0 +1,36 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.exceptions.SpringRedditException;
++import com.programming.techie.springredditclone.model.RefreshToken;
++import com.programming.techie.springredditclone.repository.RefreshTokenRepository;
++import lombok.AllArgsConstructor;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.time.Instant;
++import java.util.UUID;
++
++@Service
++@AllArgsConstructor
++@Transactional
++public class RefreshTokenService {
++
++    private final RefreshTokenRepository refreshTokenRepository;
++
++    public RefreshToken generateRefreshToken() {
++        RefreshToken refreshToken = new RefreshToken();
++        refreshToken.setToken(UUID.randomUUID().toString());
++        refreshToken.setCreatedDate(Instant.now());
++
++        return refreshTokenRepository.save(refreshToken);
++    }
++
++    void validateRefreshToken(String token) {
++        refreshTokenRepository.findByToken(token)
++                .orElseThrow(() -> new SpringRedditException("Invalid refresh Token"));
++    }
++
++    public void deleteRefreshToken(String token) {
++        refreshTokenRepository.deleteByToken(token);
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/service/PostService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/PostService.java b/src/main/java/com/programming/techie/springredditclone/service/PostService.java
+new file mode 100644
+--- /dev/null	(date 1606709435817)
++++ b/src/main/java/com/programming/techie/springredditclone/service/PostService.java	(date 1606709435817)
+@@ -0,0 +1,74 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.dto.PostRequest;
++import com.programming.techie.springredditclone.dto.PostResponse;
++import com.programming.techie.springredditclone.exceptions.PostNotFoundException;
++import com.programming.techie.springredditclone.exceptions.SubredditNotFoundException;
++import com.programming.techie.springredditclone.mapper.PostMapper;
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.Subreddit;
++import com.programming.techie.springredditclone.model.User;
++import com.programming.techie.springredditclone.repository.PostRepository;
++import com.programming.techie.springredditclone.repository.SubredditRepository;
++import com.programming.techie.springredditclone.repository.UserRepository;
++import lombok.AllArgsConstructor;
++import lombok.extern.slf4j.Slf4j;
++import org.springframework.security.core.userdetails.UsernameNotFoundException;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.util.List;
++
++import static java.util.stream.Collectors.toList;
++
++@Service
++@AllArgsConstructor
++@Slf4j
++@Transactional
++public class PostService {
++
++    private final PostRepository postRepository;
++    private final SubredditRepository subredditRepository;
++    private final UserRepository userRepository;
++    private final AuthService authService;
++    private final PostMapper postMapper;
++
++    public void save(PostRequest postRequest) {
++        Subreddit subreddit = subredditRepository.findByName(postRequest.getSubredditName())
++                .orElseThrow(() -> new SubredditNotFoundException(postRequest.getSubredditName()));
++        postRepository.save(postMapper.map(postRequest, subreddit, authService.getCurrentUser()));
++    }
++
++    @Transactional(readOnly = true)
++    public PostResponse getPost(Long id) {
++        Post post = postRepository.findById(id)
++                .orElseThrow(() -> new PostNotFoundException(id.toString()));
++        return postMapper.mapToDto(post);
++    }
++
++    @Transactional(readOnly = true)
++    public List<PostResponse> getAllPosts() {
++        return postRepository.findAll()
++                .stream()
++                .map(postMapper::mapToDto)
++                .collect(toList());
++    }
++
++    @Transactional(readOnly = true)
++    public List<PostResponse> getPostsBySubreddit(Long subredditId) {
++        Subreddit subreddit = subredditRepository.findById(subredditId)
++                .orElseThrow(() -> new SubredditNotFoundException(subredditId.toString()));
++        List<Post> posts = postRepository.findAllBySubreddit(subreddit);
++        return posts.stream().map(postMapper::mapToDto).collect(toList());
++    }
++
++    @Transactional(readOnly = true)
++    public List<PostResponse> getPostsByUsername(String username) {
++        User user = userRepository.findByUsername(username)
++                .orElseThrow(() -> new UsernameNotFoundException(username));
++        return postRepository.findByUser(user)
++                .stream()
++                .map(postMapper::mapToDto)
++                .collect(toList());
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/service/MailService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/MailService.java b/src/main/java/com/programming/techie/springredditclone/service/MailService.java
+new file mode 100644
+--- /dev/null	(date 1607133706565)
++++ b/src/main/java/com/programming/techie/springredditclone/service/MailService.java	(date 1607133706565)
+@@ -0,0 +1,40 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.exceptions.SpringRedditException;
++import com.programming.techie.springredditclone.model.NotificationEmail;
++import lombok.AllArgsConstructor;
++import lombok.extern.slf4j.Slf4j;
++import org.springframework.mail.MailException;
++import org.springframework.mail.javamail.JavaMailSender;
++import org.springframework.mail.javamail.MimeMessageHelper;
++import org.springframework.mail.javamail.MimeMessagePreparator;
++import org.springframework.scheduling.annotation.Async;
++import org.springframework.stereotype.Service;
++
++@Service
++@AllArgsConstructor
++@Slf4j
++class MailService {
++
++    private final JavaMailSender mailSender;
++    private final MailContentBuilder mailContentBuilder;
++
++    @Async
++    void sendMail(NotificationEmail notificationEmail) {
++        MimeMessagePreparator messagePreparator = mimeMessage -> {
++            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
++            messageHelper.setFrom("giventauser@gmail.com");
++            messageHelper.setTo(notificationEmail.getRecipient());
++            messageHelper.setSubject(notificationEmail.getSubject());
++            messageHelper.setText(notificationEmail.getBody());
++        };
++        try {
++            mailSender.send(messagePreparator);
++            log.info("Activation email sent!!");
++        } catch (MailException e) {
++            log.error("Exception occurred when sending mail", e);
++            throw new SpringRedditException("Exception occurred when sending mail to " + notificationEmail.getRecipient(), e);
++        }
++    }
++
++}
+\ No newline at end of file
+Index: src/main/java/com/programming/techie/springredditclone/security/JwtProvider.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/security/JwtProvider.java b/src/main/java/com/programming/techie/springredditclone/security/JwtProvider.java
+new file mode 100644
+--- /dev/null	(date 1606709435808)
++++ b/src/main/java/com/programming/techie/springredditclone/security/JwtProvider.java	(date 1606709435808)
+@@ -0,0 +1,94 @@
++package com.programming.techie.springredditclone.security;
++
++import com.programming.techie.springredditclone.exceptions.SpringRedditException;
++import io.jsonwebtoken.Claims;
++import io.jsonwebtoken.Jwts;
++import org.springframework.beans.factory.annotation.Value;
++import org.springframework.security.core.Authentication;
++import org.springframework.security.core.userdetails.User;
++import org.springframework.stereotype.Service;
++
++import javax.annotation.PostConstruct;
++import java.io.IOException;
++import java.io.InputStream;
++import java.security.*;
++import java.security.cert.CertificateException;
++import java.sql.Date;
++import java.time.Instant;
++
++import static io.jsonwebtoken.Jwts.parser;
++import static java.util.Date.from;
++
++@Service
++public class JwtProvider {
++
++    private KeyStore keyStore;
++    @Value("${jwt.expiration.time}")
++    private Long jwtExpirationInMillis;
++
++    @PostConstruct
++    public void init() {
++        try {
++            keyStore = KeyStore.getInstance("JKS");
++            InputStream resourceAsStream = getClass().getResourceAsStream("/springblog.jks");
++            keyStore.load(resourceAsStream, "secret".toCharArray());
++        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
++            throw new SpringRedditException("Exception occurred while loading keystore", e);
++        }
++
++    }
++
++    public String generateToken(Authentication authentication) {
++        User principal = (User) authentication.getPrincipal();
++        return Jwts.builder()
++                .setSubject(principal.getUsername())
++                .setIssuedAt(from(Instant.now()))
++                .signWith(getPrivateKey())
++                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
++                .compact();
++    }
++
++    public String generateTokenWithUserName(String username) {
++        return Jwts.builder()
++                .setSubject(username)
++                .setIssuedAt(from(Instant.now()))
++                .signWith(getPrivateKey())
++                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
++                .compact();
++    }
++
++    private PrivateKey getPrivateKey() {
++        try {
++            return (PrivateKey) keyStore.getKey("springblog", "secret".toCharArray());
++        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
++            throw new SpringRedditException("Exception occured while retrieving public key from keystore", e);
++        }
++    }
++
++    public boolean validateToken(String jwt) {
++        parser().setSigningKey(getPublickey()).parseClaimsJws(jwt);
++        return true;
++    }
++
++    private PublicKey getPublickey() {
++        try {
++            return keyStore.getCertificate("springblog").getPublicKey();
++        } catch (KeyStoreException e) {
++            throw new SpringRedditException("Exception occured while " +
++                    "retrieving public key from keystore", e);
++        }
++    }
++
++    public String getUsernameFromJwt(String token) {
++        Claims claims = parser()
++                .setSigningKey(getPublickey())
++                .parseClaimsJws(token)
++                .getBody();
++
++        return claims.getSubject();
++    }
++
++    public Long getJwtExpirationInMillis() {
++        return jwtExpirationInMillis;
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/security/JwtAuthenticationFilter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/security/JwtAuthenticationFilter.java b/src/main/java/com/programming/techie/springredditclone/security/JwtAuthenticationFilter.java
+new file mode 100644
+--- /dev/null	(date 1606709435805)
++++ b/src/main/java/com/programming/techie/springredditclone/security/JwtAuthenticationFilter.java	(date 1606709435805)
+@@ -0,0 +1,54 @@
++package com.programming.techie.springredditclone.security;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
++import org.springframework.security.core.context.SecurityContextHolder;
++import org.springframework.security.core.userdetails.UserDetails;
++import org.springframework.security.core.userdetails.UserDetailsService;
++import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
++import org.springframework.stereotype.Component;
++import org.springframework.util.StringUtils;
++import org.springframework.web.filter.OncePerRequestFilter;
++
++import javax.servlet.FilterChain;
++import javax.servlet.ServletException;
++import javax.servlet.http.HttpServletRequest;
++import javax.servlet.http.HttpServletResponse;
++import java.io.IOException;
++
++@Component
++public class JwtAuthenticationFilter extends OncePerRequestFilter {
++
++    @Autowired
++    private JwtProvider jwtProvider;
++    @Autowired
++    private UserDetailsService userDetailsService;
++
++    @Override
++    protected void doFilterInternal(HttpServletRequest request,
++                                    HttpServletResponse response,
++                                    FilterChain filterChain) throws ServletException, IOException {
++        String jwt = getJwtFromRequest(request);
++
++        if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
++            String username = jwtProvider.getUsernameFromJwt(jwt);
++
++            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
++            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
++                    null, userDetails.getAuthorities());
++            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
++
++            SecurityContextHolder.getContext().setAuthentication(authentication);
++        }
++        filterChain.doFilter(request, response);
++    }
++
++    private String getJwtFromRequest(HttpServletRequest request) {
++        String bearerToken = request.getHeader("Authorization");
++
++        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
++            return bearerToken.substring(7);
++        }
++        return bearerToken;
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/service/VoteService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/VoteService.java b/src/main/java/com/programming/techie/springredditclone/service/VoteService.java
+new file mode 100644
+--- /dev/null	(date 1606709435824)
++++ b/src/main/java/com/programming/techie/springredditclone/service/VoteService.java	(date 1606709435824)
+@@ -0,0 +1,53 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.dto.VoteDto;
++import com.programming.techie.springredditclone.exceptions.PostNotFoundException;
++import com.programming.techie.springredditclone.exceptions.SpringRedditException;
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.Vote;
++import com.programming.techie.springredditclone.repository.PostRepository;
++import com.programming.techie.springredditclone.repository.VoteRepository;
++import lombok.AllArgsConstructor;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.util.Optional;
++
++import static com.programming.techie.springredditclone.model.VoteType.UPVOTE;
++
++@Service
++@AllArgsConstructor
++public class VoteService {
++
++    private final VoteRepository voteRepository;
++    private final PostRepository postRepository;
++    private final AuthService authService;
++
++    @Transactional
++    public void vote(VoteDto voteDto) {
++        Post post = postRepository.findById(voteDto.getPostId())
++                .orElseThrow(() -> new PostNotFoundException("Post Not Found with ID - " + voteDto.getPostId()));
++        Optional<Vote> voteByPostAndUser = voteRepository.findTopByPostAndUserOrderByVoteIdDesc(post, authService.getCurrentUser());
++        if (voteByPostAndUser.isPresent() &&
++                voteByPostAndUser.get().getVoteType()
++                        .equals(voteDto.getVoteType())) {
++            throw new SpringRedditException("You have already "
++                    + voteDto.getVoteType() + "'d for this post");
++        }
++        if (UPVOTE.equals(voteDto.getVoteType())) {
++            post.setVoteCount(post.getVoteCount() + 1);
++        } else {
++            post.setVoteCount(post.getVoteCount() - 1);
++        }
++        voteRepository.save(mapToVote(voteDto, post));
++        postRepository.save(post);
++    }
++
++    private Vote mapToVote(VoteDto voteDto, Post post) {
++        return Vote.builder()
++                .voteType(voteDto.getVoteType())
++                .post(post)
++                .user(authService.getCurrentUser())
++                .build();
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/service/UserDetailsServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/UserDetailsServiceImpl.java b/src/main/java/com/programming/techie/springredditclone/service/UserDetailsServiceImpl.java
+new file mode 100644
+--- /dev/null	(date 1606709435823)
++++ b/src/main/java/com/programming/techie/springredditclone/service/UserDetailsServiceImpl.java	(date 1606709435823)
+@@ -0,0 +1,41 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.model.User;
++import com.programming.techie.springredditclone.repository.UserRepository;
++import lombok.AllArgsConstructor;
++import org.springframework.security.core.GrantedAuthority;
++import org.springframework.security.core.authority.SimpleGrantedAuthority;
++import org.springframework.security.core.userdetails.UserDetails;
++import org.springframework.security.core.userdetails.UserDetailsService;
++import org.springframework.security.core.userdetails.UsernameNotFoundException;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.util.Collection;
++import java.util.Optional;
++
++import static java.util.Collections.singletonList;
++
++@Service
++@AllArgsConstructor
++public class UserDetailsServiceImpl implements UserDetailsService {
++    private final UserRepository userRepository;
++
++    @Override
++    @Transactional(readOnly = true)
++    public UserDetails loadUserByUsername(String username) {
++        Optional<User> userOptional = userRepository.findByUsername(username);
++        User user = userOptional
++                .orElseThrow(() -> new UsernameNotFoundException("No user " +
++                        "Found with username : " + username));
++
++        return new org.springframework.security
++                .core.userdetails.User(user.getUsername(), user.getPassword(),
++                user.isEnabled(), true, true,
++                true, getAuthorities("USER"));
++    }
++
++    private Collection<? extends GrantedAuthority> getAuthorities(String role) {
++        return singletonList(new SimpleGrantedAuthority(role));
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/controller/SubredditController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/controller/SubredditController.java b/src/main/java/com/programming/techie/springredditclone/controller/SubredditController.java
+new file mode 100644
+--- /dev/null	(date 1606709435741)
++++ b/src/main/java/com/programming/techie/springredditclone/controller/SubredditController.java	(date 1606709435741)
+@@ -0,0 +1,40 @@
++package com.programming.techie.springredditclone.controller;
++
++import com.programming.techie.springredditclone.dto.SubredditDto;
++import com.programming.techie.springredditclone.service.SubredditService;
++import lombok.AllArgsConstructor;
++import lombok.extern.slf4j.Slf4j;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("/api/subreddit")
++@AllArgsConstructor
++@Slf4j
++public class SubredditController {
++
++    private final SubredditService subredditService;
++
++    @PostMapping
++    public ResponseEntity<SubredditDto> createSubreddit(@RequestBody SubredditDto subredditDto) {
++        return ResponseEntity.status(HttpStatus.CREATED)
++                .body(subredditService.save(subredditDto));
++    }
++
++    @GetMapping
++    public ResponseEntity<List<SubredditDto>> getAllSubreddits() {
++        return ResponseEntity
++                .status(HttpStatus.OK)
++                .body(subredditService.getAll());
++    }
++
++    @GetMapping("/{id}")
++    public ResponseEntity<SubredditDto> getSubreddit(@PathVariable Long id) {
++        return ResponseEntity
++                .status(HttpStatus.OK)
++                .body(subredditService.getSubreddit(id));
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/controller/PostController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/controller/PostController.java b/src/main/java/com/programming/techie/springredditclone/controller/PostController.java
+new file mode 100644
+--- /dev/null	(date 1606709435739)
++++ b/src/main/java/com/programming/techie/springredditclone/controller/PostController.java	(date 1606709435739)
+@@ -0,0 +1,47 @@
++package com.programming.techie.springredditclone.controller;
++
++import com.programming.techie.springredditclone.dto.PostRequest;
++import com.programming.techie.springredditclone.dto.PostResponse;
++import com.programming.techie.springredditclone.service.PostService;
++import lombok.AllArgsConstructor;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++import static org.springframework.http.ResponseEntity.status;
++
++@RestController
++@RequestMapping("/api/posts/")
++@AllArgsConstructor
++public class PostController {
++
++    private final PostService postService;
++
++    @PostMapping
++    public ResponseEntity<Void> createPost(@RequestBody PostRequest postRequest) {
++        postService.save(postRequest);
++        return new ResponseEntity<>(HttpStatus.CREATED);
++    }
++
++    @GetMapping
++    public ResponseEntity<List<PostResponse>> getAllPosts() {
++        return status(HttpStatus.OK).body(postService.getAllPosts());
++    }
++
++    @GetMapping("/{id}")
++    public ResponseEntity<PostResponse> getPost(@PathVariable Long id) {
++        return status(HttpStatus.OK).body(postService.getPost(id));
++    }
++
++    @GetMapping("by-subreddit/{id}")
++    public ResponseEntity<List<PostResponse>> getPostsBySubreddit(Long id) {
++        return status(HttpStatus.OK).body(postService.getPostsBySubreddit(id));
++    }
++
++    @GetMapping("by-user/{name}")
++    public ResponseEntity<List<PostResponse>> getPostsByUsername(String username) {
++        return status(HttpStatus.OK).body(postService.getPostsByUsername(username));
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/controller/CommentsController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/controller/CommentsController.java b/src/main/java/com/programming/techie/springredditclone/controller/CommentsController.java
+new file mode 100644
+--- /dev/null	(date 1606709435737)
++++ b/src/main/java/com/programming/techie/springredditclone/controller/CommentsController.java	(date 1606709435737)
+@@ -0,0 +1,38 @@
++package com.programming.techie.springredditclone.controller;
++
++import com.programming.techie.springredditclone.dto.CommentsDto;
++import com.programming.techie.springredditclone.service.CommentService;
++import lombok.AllArgsConstructor;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++import static org.springframework.http.HttpStatus.CREATED;
++import static org.springframework.http.HttpStatus.OK;
++
++@RestController
++@RequestMapping("/api/comments/")
++@AllArgsConstructor
++public class CommentsController {
++    private final CommentService commentService;
++
++    @PostMapping
++    public ResponseEntity<Void> createComment(@RequestBody CommentsDto commentsDto) {
++        commentService.save(commentsDto);
++        return new ResponseEntity<>(CREATED);
++    }
++
++    @GetMapping("/by-post/{postId}")
++    public ResponseEntity<List<CommentsDto>> getAllCommentsForPost(@PathVariable Long postId) {
++        return ResponseEntity.status(OK)
++                .body(commentService.getAllCommentsForPost(postId));
++    }
++
++    @GetMapping("/by-user/{userName}")
++    public ResponseEntity<List<CommentsDto>> getAllCommentsForUser(@PathVariable String userName){
++        return ResponseEntity.status(OK)
++                .body(commentService.getAllCommentsForUser(userName));
++    }
++
++}
+Index: src/main/java/com/programming/techie/springredditclone/controller/AuthController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/controller/AuthController.java b/src/main/java/com/programming/techie/springredditclone/controller/AuthController.java
+new file mode 100644
+--- /dev/null	(date 1606709435735)
++++ b/src/main/java/com/programming/techie/springredditclone/controller/AuthController.java	(date 1606709435735)
+@@ -0,0 +1,53 @@
++package com.programming.techie.springredditclone.controller;
++
++import com.programming.techie.springredditclone.dto.AuthenticationResponse;
++import com.programming.techie.springredditclone.dto.LoginRequest;
++import com.programming.techie.springredditclone.dto.RefreshTokenRequest;
++import com.programming.techie.springredditclone.dto.RegisterRequest;
++import com.programming.techie.springredditclone.service.AuthService;
++import com.programming.techie.springredditclone.service.RefreshTokenService;
++import lombok.AllArgsConstructor;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import javax.validation.Valid;
++
++import static org.springframework.http.HttpStatus.OK;
++
++@RestController
++@RequestMapping("/api/auth")
++@AllArgsConstructor
++public class AuthController {
++
++    private final AuthService authService;
++    private final RefreshTokenService refreshTokenService;
++
++    @PostMapping("/signup")
++    public ResponseEntity<String> signup(@RequestBody RegisterRequest registerRequest) {
++        authService.signup(registerRequest);
++        return new ResponseEntity<>("User Registration Successful",
++                OK);
++    }
++
++    @GetMapping("accountVerification/{token}")
++    public ResponseEntity<String> verifyAccount(@PathVariable String token) {
++        authService.verifyAccount(token);
++        return new ResponseEntity<>("Account Activated Successfully", OK);
++    }
++
++    @PostMapping("/login")
++    public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
++        return authService.login(loginRequest);
++    }
++
++    @PostMapping("/refresh/token")
++    public AuthenticationResponse refreshTokens(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
++        return authService.refreshToken(refreshTokenRequest);
++    }
++
++    @PostMapping("/logout")
++    public ResponseEntity<String> logout(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
++        refreshTokenService.deleteRefreshToken(refreshTokenRequest.getRefreshToken());
++        return ResponseEntity.status(OK).body("Refresh Token Deleted Successfully!!");
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/exceptions/SubredditNotFoundException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/exceptions/SubredditNotFoundException.java b/src/main/java/com/programming/techie/springredditclone/exceptions/SubredditNotFoundException.java
+new file mode 100644
+--- /dev/null	(date 1606709435768)
++++ b/src/main/java/com/programming/techie/springredditclone/exceptions/SubredditNotFoundException.java	(date 1606709435768)
+@@ -0,0 +1,7 @@
++package com.programming.techie.springredditclone.exceptions;
++
++public class SubredditNotFoundException extends RuntimeException {
++    public SubredditNotFoundException(String message) {
++        super(message);
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/exceptions/SpringRedditException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/exceptions/SpringRedditException.java b/src/main/java/com/programming/techie/springredditclone/exceptions/SpringRedditException.java
+new file mode 100644
+--- /dev/null	(date 1606709435766)
++++ b/src/main/java/com/programming/techie/springredditclone/exceptions/SpringRedditException.java	(date 1606709435766)
+@@ -0,0 +1,11 @@
++package com.programming.techie.springredditclone.exceptions;
++
++public class SpringRedditException extends RuntimeException {
++    public SpringRedditException(String exMessage, Exception exception) {
++        super(exMessage, exception);
++    }
++
++    public SpringRedditException(String exMessage) {
++        super(exMessage);
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/exceptions/PostNotFoundException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/exceptions/PostNotFoundException.java b/src/main/java/com/programming/techie/springredditclone/exceptions/PostNotFoundException.java
+new file mode 100644
+--- /dev/null	(date 1606709435764)
++++ b/src/main/java/com/programming/techie/springredditclone/exceptions/PostNotFoundException.java	(date 1606709435764)
+@@ -0,0 +1,6 @@
++package com.programming.techie.springredditclone.exceptions;
++
++public class PostNotFoundException extends RuntimeException {
++    public PostNotFoundException(String message) {
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/controller/VoteController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/controller/VoteController.java b/src/main/java/com/programming/techie/springredditclone/controller/VoteController.java
+new file mode 100644
+--- /dev/null	(date 1606709435744)
++++ b/src/main/java/com/programming/techie/springredditclone/controller/VoteController.java	(date 1606709435744)
+@@ -0,0 +1,25 @@
++package com.programming.techie.springredditclone.controller;
++
++import com.programming.techie.springredditclone.dto.VoteDto;
++import com.programming.techie.springredditclone.service.VoteService;
++import lombok.AllArgsConstructor;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.PostMapping;
++import org.springframework.web.bind.annotation.RequestBody;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.RestController;
++
++@RestController
++@RequestMapping("/api/votes/")
++@AllArgsConstructor
++public class VoteController {
++
++    private final VoteService voteService;
++
++    @PostMapping
++    public ResponseEntity<Void> vote(@RequestBody VoteDto voteDto) {
++        voteService.vote(voteDto);
++        return new ResponseEntity<>(HttpStatus.OK);
++    }
++}
+\ No newline at end of file
+Index: src/main/java/com/programming/techie/springredditclone/repository/SubredditRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/repository/SubredditRepository.java b/src/main/java/com/programming/techie/springredditclone/repository/SubredditRepository.java
+new file mode 100644
+--- /dev/null	(date 1606709435797)
++++ b/src/main/java/com/programming/techie/springredditclone/repository/SubredditRepository.java	(date 1606709435797)
+@@ -0,0 +1,13 @@
++package com.programming.techie.springredditclone.repository;
++
++import com.programming.techie.springredditclone.model.Subreddit;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.util.Optional;
++
++@Repository
++public interface SubredditRepository extends JpaRepository<Subreddit, Long> {
++
++    Optional<Subreddit> findByName(String subredditName);
++}
+Index: src/main/java/com/programming/techie/springredditclone/repository/RefreshTokenRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/repository/RefreshTokenRepository.java b/src/main/java/com/programming/techie/springredditclone/repository/RefreshTokenRepository.java
+new file mode 100644
+--- /dev/null	(date 1606709435795)
++++ b/src/main/java/com/programming/techie/springredditclone/repository/RefreshTokenRepository.java	(date 1606709435795)
+@@ -0,0 +1,12 @@
++package com.programming.techie.springredditclone.repository;
++
++import com.programming.techie.springredditclone.model.RefreshToken;
++import org.springframework.data.jpa.repository.JpaRepository;
++
++import java.util.Optional;
++
++public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
++    Optional<RefreshToken> findByToken(String token);
++
++    void deleteByToken(String token);
++}
+Index: src/main/java/com/programming/techie/springredditclone/repository/PostRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/repository/PostRepository.java b/src/main/java/com/programming/techie/springredditclone/repository/PostRepository.java
+new file mode 100644
+--- /dev/null	(date 1606709435793)
++++ b/src/main/java/com/programming/techie/springredditclone/repository/PostRepository.java	(date 1606709435793)
+@@ -0,0 +1,16 @@
++package com.programming.techie.springredditclone.repository;
++
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.Subreddit;
++import com.programming.techie.springredditclone.model.User;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.util.List;
++
++@Repository
++public interface PostRepository extends JpaRepository<Post, Long> {
++    List<Post> findAllBySubreddit(Subreddit subreddit);
++
++    List<Post> findByUser(User user);
++}
+Index: src/main/java/com/programming/techie/springredditclone/repository/CommentRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/repository/CommentRepository.java b/src/main/java/com/programming/techie/springredditclone/repository/CommentRepository.java
+new file mode 100644
+--- /dev/null	(date 1606709435791)
++++ b/src/main/java/com/programming/techie/springredditclone/repository/CommentRepository.java	(date 1606709435791)
+@@ -0,0 +1,16 @@
++package com.programming.techie.springredditclone.repository;
++
++import com.programming.techie.springredditclone.model.Comment;
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.User;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.util.List;
++
++@Repository
++public interface CommentRepository extends JpaRepository<Comment, Long> {
++    List<Comment> findByPost(Post post);
++
++    List<Comment> findAllByUser(User user);
++}
+Index: src/main/java/com/programming/techie/springredditclone/repository/VoteRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/repository/VoteRepository.java b/src/main/java/com/programming/techie/springredditclone/repository/VoteRepository.java
+new file mode 100644
+--- /dev/null	(date 1606709435803)
++++ b/src/main/java/com/programming/techie/springredditclone/repository/VoteRepository.java	(date 1606709435803)
+@@ -0,0 +1,14 @@
++package com.programming.techie.springredditclone.repository;
++
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.User;
++import com.programming.techie.springredditclone.model.Vote;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.util.Optional;
++
++@Repository
++public interface VoteRepository extends JpaRepository<Vote, Long> {
++    Optional<Vote> findTopByPostAndUserOrderByVoteIdDesc(Post post, User currentUser);
++}
+Index: src/main/java/com/programming/techie/springredditclone/repository/VerificationTokenRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/repository/VerificationTokenRepository.java b/src/main/java/com/programming/techie/springredditclone/repository/VerificationTokenRepository.java
+new file mode 100644
+--- /dev/null	(date 1606709435801)
++++ b/src/main/java/com/programming/techie/springredditclone/repository/VerificationTokenRepository.java	(date 1606709435801)
+@@ -0,0 +1,12 @@
++package com.programming.techie.springredditclone.repository;
++
++import com.programming.techie.springredditclone.model.VerificationToken;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.util.Optional;
++
++@Repository
++public interface VerificationTokenRepository extends JpaRepository<VerificationToken, Long> {
++    Optional<VerificationToken> findByToken(String token);
++}
+Index: src/main/java/com/programming/techie/springredditclone/repository/UserRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/repository/UserRepository.java b/src/main/java/com/programming/techie/springredditclone/repository/UserRepository.java
+new file mode 100644
+--- /dev/null	(date 1606709435799)
++++ b/src/main/java/com/programming/techie/springredditclone/repository/UserRepository.java	(date 1606709435799)
+@@ -0,0 +1,12 @@
++package com.programming.techie.springredditclone.repository;
++
++import com.programming.techie.springredditclone.model.User;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.util.Optional;
++
++@Repository
++public interface UserRepository extends JpaRepository<User, Long> {
++    Optional<User> findByUsername(String username);
++}
+Index: mvnw
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/mvnw b/mvnw
+new file mode 100644
+--- /dev/null	(date 1606709435715)
++++ b/mvnw	(date 1606709435715)
+@@ -0,0 +1,286 @@
++#!/bin/sh
++# ----------------------------------------------------------------------------
++# Licensed to the Apache Software Foundation (ASF) under one
++# or more contributor license agreements.  See the NOTICE file
++# distributed with this work for additional information
++# regarding copyright ownership.  The ASF licenses this file
++# to you under the Apache License, Version 2.0 (the
++# "License"); you may not use this file except in compliance
++# with the License.  You may obtain a copy of the License at
++#
++#    https://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing,
++# software distributed under the License is distributed on an
++# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++# KIND, either express or implied.  See the License for the
++# specific language governing permissions and limitations
++# under the License.
++# ----------------------------------------------------------------------------
++
++# ----------------------------------------------------------------------------
++# Maven2 Start Up Batch script
++#
++# Required ENV vars:
++# ------------------
++#   JAVA_HOME - location of a JDK home dir
++#
++# Optional ENV vars
++# -----------------
++#   M2_HOME - location of maven2's installed home dir
++#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
++#     e.g. to debug Maven itself, use
++#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
++#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
++# ----------------------------------------------------------------------------
++
++if [ -z "$MAVEN_SKIP_RC" ] ; then
++
++  if [ -f /etc/mavenrc ] ; then
++    . /etc/mavenrc
++  fi
++
++  if [ -f "$HOME/.mavenrc" ] ; then
++    . "$HOME/.mavenrc"
++  fi
++
++fi
++
++# OS specific support.  $var _must_ be set to either true or false.
++cygwin=false;
++darwin=false;
++mingw=false
++case "`uname`" in
++  CYGWIN*) cygwin=true ;;
++  MINGW*) mingw=true;;
++  Darwin*) darwin=true
++    # Use /usr/libexec/java_home if available, otherwise fall back to /Library/Java/Home
++    # See https://developer.apple.com/library/mac/qa/qa1170/_index.html
++    if [ -z "$JAVA_HOME" ]; then
++      if [ -x "/usr/libexec/java_home" ]; then
++        export JAVA_HOME="`/usr/libexec/java_home`"
++      else
++        export JAVA_HOME="/Library/Java/Home"
++      fi
++    fi
++    ;;
++esac
++
++if [ -z "$JAVA_HOME" ] ; then
++  if [ -r /etc/gentoo-release ] ; then
++    JAVA_HOME=`java-config --jre-home`
++  fi
++fi
++
++if [ -z "$M2_HOME" ] ; then
++  ## resolve links - $0 may be a link to maven's home
++  PRG="$0"
++
++  # need this for relative symlinks
++  while [ -h "$PRG" ] ; do
++    ls=`ls -ld "$PRG"`
++    link=`expr "$ls" : '.*-> \(.*\)$'`
++    if expr "$link" : '/.*' > /dev/null; then
++      PRG="$link"
++    else
++      PRG="`dirname "$PRG"`/$link"
++    fi
++  done
++
++  saveddir=`pwd`
++
++  M2_HOME=`dirname "$PRG"`/..
++
++  # make it fully qualified
++  M2_HOME=`cd "$M2_HOME" && pwd`
++
++  cd "$saveddir"
++  # echo Using m2 at $M2_HOME
++fi
++
++# For Cygwin, ensure paths are in UNIX format before anything is touched
++if $cygwin ; then
++  [ -n "$M2_HOME" ] &&
++    M2_HOME=`cygpath --unix "$M2_HOME"`
++  [ -n "$JAVA_HOME" ] &&
++    JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
++  [ -n "$CLASSPATH" ] &&
++    CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
++fi
++
++# For Mingw, ensure paths are in UNIX format before anything is touched
++if $mingw ; then
++  [ -n "$M2_HOME" ] &&
++    M2_HOME="`(cd "$M2_HOME"; pwd)`"
++  [ -n "$JAVA_HOME" ] &&
++    JAVA_HOME="`(cd "$JAVA_HOME"; pwd)`"
++  # TODO classpath?
++fi
++
++if [ -z "$JAVA_HOME" ]; then
++  javaExecutable="`which javac`"
++  if [ -n "$javaExecutable" ] && ! [ "`expr \"$javaExecutable\" : '\([^ ]*\)'`" = "no" ]; then
++    # readlink(1) is not available as standard on Solaris 10.
++    readLink=`which readlink`
++    if [ ! `expr "$readLink" : '\([^ ]*\)'` = "no" ]; then
++      if $darwin ; then
++        javaHome="`dirname \"$javaExecutable\"`"
++        javaExecutable="`cd \"$javaHome\" && pwd -P`/javac"
++      else
++        javaExecutable="`readlink -f \"$javaExecutable\"`"
++      fi
++      javaHome="`dirname \"$javaExecutable\"`"
++      javaHome=`expr "$javaHome" : '\(.*\)/bin'`
++      JAVA_HOME="$javaHome"
++      export JAVA_HOME
++    fi
++  fi
++fi
++
++if [ -z "$JAVACMD" ] ; then
++  if [ -n "$JAVA_HOME"  ] ; then
++    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
++      # IBM's JDK on AIX uses strange locations for the executables
++      JAVACMD="$JAVA_HOME/jre/sh/java"
++    else
++      JAVACMD="$JAVA_HOME/bin/java"
++    fi
++  else
++    JAVACMD="`which java`"
++  fi
++fi
++
++if [ ! -x "$JAVACMD" ] ; then
++  echo "Error: JAVA_HOME is not defined correctly." >&2
++  echo "  We cannot execute $JAVACMD" >&2
++  exit 1
++fi
++
++if [ -z "$JAVA_HOME" ] ; then
++  echo "Warning: JAVA_HOME environment variable is not set."
++fi
++
++CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
++
++# traverses directory structure from process work directory to filesystem root
++# first directory with .mvn subdirectory is considered project base directory
++find_maven_basedir() {
++
++  if [ -z "$1" ]
++  then
++    echo "Path not specified to find_maven_basedir"
++    return 1
++  fi
++
++  basedir="$1"
++  wdir="$1"
++  while [ "$wdir" != '/' ] ; do
++    if [ -d "$wdir"/.mvn ] ; then
++      basedir=$wdir
++      break
++    fi
++    # workaround for JBEAP-8937 (on Solaris 10/Sparc)
++    if [ -d "${wdir}" ]; then
++      wdir=`cd "$wdir/.."; pwd`
++    fi
++    # end of workaround
++  done
++  echo "${basedir}"
++}
++
++# concatenates all lines of a file
++concat_lines() {
++  if [ -f "$1" ]; then
++    echo "$(tr -s '\n' ' ' < "$1")"
++  fi
++}
++
++BASE_DIR=`find_maven_basedir "$(pwd)"`
++if [ -z "$BASE_DIR" ]; then
++  exit 1;
++fi
++
++##########################################################################################
++# Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
++# This allows using the maven wrapper in projects that prohibit checking in binary data.
++##########################################################################################
++if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
++    if [ "$MVNW_VERBOSE" = true ]; then
++      echo "Found .mvn/wrapper/maven-wrapper.jar"
++    fi
++else
++    if [ "$MVNW_VERBOSE" = true ]; then
++      echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
++    fi
++    jarUrl="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.4.2/maven-wrapper-0.4.2.jar"
++    while IFS="=" read key value; do
++      case "$key" in (wrapperUrl) jarUrl="$value"; break ;;
++      esac
++    done < "$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
++    if [ "$MVNW_VERBOSE" = true ]; then
++      echo "Downloading from: $jarUrl"
++    fi
++    wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
++
++    if command -v wget > /dev/null; then
++        if [ "$MVNW_VERBOSE" = true ]; then
++          echo "Found wget ... using wget"
++        fi
++        wget "$jarUrl" -O "$wrapperJarPath"
++    elif command -v curl > /dev/null; then
++        if [ "$MVNW_VERBOSE" = true ]; then
++          echo "Found curl ... using curl"
++        fi
++        curl -o "$wrapperJarPath" "$jarUrl"
++    else
++        if [ "$MVNW_VERBOSE" = true ]; then
++          echo "Falling back to using Java to download"
++        fi
++        javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
++        if [ -e "$javaClass" ]; then
++            if [ ! -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
++                if [ "$MVNW_VERBOSE" = true ]; then
++                  echo " - Compiling MavenWrapperDownloader.java ..."
++                fi
++                # Compiling the Java class
++                ("$JAVA_HOME/bin/javac" "$javaClass")
++            fi
++            if [ -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
++                # Running the downloader
++                if [ "$MVNW_VERBOSE" = true ]; then
++                  echo " - Running MavenWrapperDownloader.java ..."
++                fi
++                ("$JAVA_HOME/bin/java" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
++            fi
++        fi
++    fi
++fi
++##########################################################################################
++# End of extension
++##########################################################################################
++
++export MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$BASE_DIR"}
++if [ "$MVNW_VERBOSE" = true ]; then
++  echo $MAVEN_PROJECTBASEDIR
++fi
++MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
++
++# For Cygwin, switch paths to Windows format before running java
++if $cygwin; then
++  [ -n "$M2_HOME" ] &&
++    M2_HOME=`cygpath --path --windows "$M2_HOME"`
++  [ -n "$JAVA_HOME" ] &&
++    JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
++  [ -n "$CLASSPATH" ] &&
++    CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
++  [ -n "$MAVEN_PROJECTBASEDIR" ] &&
++    MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
++fi
++
++WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
++
++exec "$JAVACMD" \
++  $MAVEN_OPTS \
++  -classpath "$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.jar" \
++  "-Dmaven.home=${M2_HOME}" "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
++  ${WRAPPER_LAUNCHER} $MAVEN_CONFIG "$@"
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+--- /dev/null	(date 1606709435700)
++++ b/.gitignore	(date 1606709435700)
+@@ -0,0 +1,31 @@
++HELP.md
++target/
++!.mvn/wrapper/maven-wrapper.jar
++!**/src/main/**
++!**/src/test/**
++
++### STS ###
++.apt_generated
++.classpath
++.factorypath
++.project
++.settings
++.springBeans
++.sts4-cache
++
++### IntelliJ IDEA ###
++.idea
++*.iws
++*.iml
++*.ipr
++
++### NetBeans ###
++/nbproject/private/
++/nbbuild/
++/dist/
++/nbdist/
++/.nb-gradle/
++build/
++
++### VS Code ###
++.vscode/
+Index: README_1.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README_1.md b/README_1.md
+new file mode 100644
+--- /dev/null	(date 1606709435713)
++++ b/README_1.md	(date 1606709435713)
+@@ -0,0 +1,36 @@
++# spring-reddit-clone
++Reddit clone built using Spring Boot, Spring Security with JPA Authentication, Spring Data JPA with MySQL, Spring MVC. The frontend is built using Angular - You can find the frontend source code here - https://github.com/SaiUpadhyayula/angular-reddit-clone
++
++# NOTE
++This source code is used as a starting point for my other tutorials which shows how to deploy the Spring Boot and Angular app to Heroku and Testing Spring boot applications:
++
++The complete source code for the ![Deploy Spring Boot and Angular to Heroku](https://www.youtube.com/watch?v=y_idn12FB18&t=8s) can be found at https://github.com/SaiUpadhyayula/spring-reddit-clone-heroku-deployment
++
++The complete source code for the ![Testing Spring Boot Applications](https://youtu.be/--nQfs67zCM) can be found at https://github.com/SaiUpadhyayula/spring-boot-testing-reddit-clone
++
++# Tutorial
++https://programmingtechie.com/2019/09/30/build-a-full-stack-reddit-clone-with-spring-boot-and-angular-part-1/
++
++# Front end code
++https://github.com/SaiUpadhyayula/angular-reddit-clone
++
++# Screenshots
++1. Home Page
++
++![Home Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/reddit-screenshot-updated.PNG)
++
++2. View Post Page
++
++![View Post Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/reddit-screenshot-updated.PNG)
++
++3. Create Post Page
++
++![Create Post Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/create-post.PNG)
++
++4. Create Subreddit Page
++
++![Create Subreddit Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/create-subreddit.PNG)
++
++5. User Profile Page
++
++![User Profile Page](https://github.com/SaiUpadhyayula/spring-reddit-clone/blob/master/src/main/resources/images/user-profile.PNG)
+Index: mvnw.cmd
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/mvnw.cmd b/mvnw.cmd
+new file mode 100644
+--- /dev/null	(date 1606709435717)
++++ b/mvnw.cmd	(date 1606709435717)
+@@ -0,0 +1,161 @@
++@REM ----------------------------------------------------------------------------
++@REM Licensed to the Apache Software Foundation (ASF) under one
++@REM or more contributor license agreements.  See the NOTICE file
++@REM distributed with this work for additional information
++@REM regarding copyright ownership.  The ASF licenses this file
++@REM to you under the Apache License, Version 2.0 (the
++@REM "License"); you may not use this file except in compliance
++@REM with the License.  You may obtain a copy of the License at
++@REM
++@REM    https://www.apache.org/licenses/LICENSE-2.0
++@REM
++@REM Unless required by applicable law or agreed to in writing,
++@REM software distributed under the License is distributed on an
++@REM "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++@REM KIND, either express or implied.  See the License for the
++@REM specific language governing permissions and limitations
++@REM under the License.
++@REM ----------------------------------------------------------------------------
++
++@REM ----------------------------------------------------------------------------
++@REM Maven2 Start Up Batch script
++@REM
++@REM Required ENV vars:
++@REM JAVA_HOME - location of a JDK home dir
++@REM
++@REM Optional ENV vars
++@REM M2_HOME - location of maven2's installed home dir
++@REM MAVEN_BATCH_ECHO - set to 'on' to enable the echoing of the batch commands
++@REM MAVEN_BATCH_PAUSE - set to 'on' to wait for a key stroke before ending
++@REM MAVEN_OPTS - parameters passed to the Java VM when running Maven
++@REM     e.g. to debug Maven itself, use
++@REM set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
++@REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
++@REM ----------------------------------------------------------------------------
++
++@REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
++@echo off
++@REM set title of command window
++title %0
++@REM enable echoing my setting MAVEN_BATCH_ECHO to 'on'
++@if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
++
++@REM set %HOME% to equivalent of $HOME
++if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
++
++@REM Execute a user defined script before this one
++if not "%MAVEN_SKIP_RC%" == "" goto skipRcPre
++@REM check for pre script, once with legacy .bat ending and once with .cmd ending
++if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
++if exist "%HOME%\mavenrc_pre.cmd" call "%HOME%\mavenrc_pre.cmd"
++:skipRcPre
++
++@setlocal
++
++set ERROR_CODE=0
++
++@REM To isolate internal variables from possible post scripts, we use another setlocal
++@setlocal
++
++@REM ==== START VALIDATION ====
++if not "%JAVA_HOME%" == "" goto OkJHome
++
++echo.
++echo Error: JAVA_HOME not found in your environment. >&2
++echo Please set the JAVA_HOME variable in your environment to match the >&2
++echo location of your Java installation. >&2
++echo.
++goto error
++
++:OkJHome
++if exist "%JAVA_HOME%\bin\java.exe" goto init
++
++echo.
++echo Error: JAVA_HOME is set to an invalid directory. >&2
++echo JAVA_HOME = "%JAVA_HOME%" >&2
++echo Please set the JAVA_HOME variable in your environment to match the >&2
++echo location of your Java installation. >&2
++echo.
++goto error
++
++@REM ==== END VALIDATION ====
++
++:init
++
++@REM Find the project base dir, i.e. the directory that contains the folder ".mvn".
++@REM Fallback to current working directory if not found.
++
++set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
++IF NOT "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
++
++set EXEC_DIR=%CD%
++set WDIR=%EXEC_DIR%
++:findBaseDir
++IF EXIST "%WDIR%"\.mvn goto baseDirFound
++cd ..
++IF "%WDIR%"=="%CD%" goto baseDirNotFound
++set WDIR=%CD%
++goto findBaseDir
++
++:baseDirFound
++set MAVEN_PROJECTBASEDIR=%WDIR%
++cd "%EXEC_DIR%"
++goto endDetectBaseDir
++
++:baseDirNotFound
++set MAVEN_PROJECTBASEDIR=%EXEC_DIR%
++cd "%EXEC_DIR%"
++
++:endDetectBaseDir
++
++IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
++
++@setlocal EnableExtensions EnableDelayedExpansion
++for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
++@endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
++
++:endReadAdditionalConfig
++
++SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
++set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
++set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
++
++set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.4.2/maven-wrapper-0.4.2.jar"
++FOR /F "tokens=1,2 delims==" %%A IN (%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties) DO (
++	IF "%%A"=="wrapperUrl" SET DOWNLOAD_URL=%%B 
++)
++
++@REM Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
++@REM This allows using the maven wrapper in projects that prohibit checking in binary data.
++if exist %WRAPPER_JAR% (
++    echo Found %WRAPPER_JAR%
++) else (
++    echo Couldn't find %WRAPPER_JAR%, downloading it ...
++	echo Downloading from: %DOWNLOAD_URL%
++    powershell -Command "(New-Object Net.WebClient).DownloadFile('%DOWNLOAD_URL%', '%WRAPPER_JAR%')"
++    echo Finished downloading %WRAPPER_JAR%
++)
++@REM End of extension
++
++%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %WRAPPER_JAR% "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %WRAPPER_LAUNCHER% %MAVEN_CONFIG% %*
++if ERRORLEVEL 1 goto error
++goto end
++
++:error
++set ERROR_CODE=1
++
++:end
++@endlocal & set ERROR_CODE=%ERROR_CODE%
++
++if not "%MAVEN_SKIP_RC%" == "" goto skipRcPost
++@REM check for post script, once with legacy .bat ending and once with .cmd ending
++if exist "%HOME%\mavenrc_post.bat" call "%HOME%\mavenrc_post.bat"
++if exist "%HOME%\mavenrc_post.cmd" call "%HOME%\mavenrc_post.cmd"
++:skipRcPost
++
++@REM pause the script if MAVEN_BATCH_PAUSE is set to 'on'
++if "%MAVEN_BATCH_PAUSE%" == "on" pause
++
++if "%MAVEN_TERMINATE_CMD%" == "on" exit %ERROR_CODE%
++
++exit /B %ERROR_CODE%
+Index: src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+diff --git a/src/main/resources/application.properties b/src/main/resources/application.properties
+new file mode 100644
+--- /dev/null	(date 1607135822272)
++++ b/src/main/resources/application.properties	(date 1607135822272)
+@@ -0,0 +1,34 @@
++############# Database Properties ###########################################
++spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
++spring.datasource.url=jdbc:mysql://localhost:3306/spring-reddit-clone?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
++spring.datasource.username=root
++#spring.datasource.password=mysql
++spring.datasource.password=root
++
++spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
++spring.jpa.hibernate.ddl-auto=update
++spring.datasource.initialization-mode=always
++spring.jpa.show-sql=true
++############# Mail Properties ###########################################
++spring.mail.host=smtp.mailtrap.io
++spring.mail.port=25
++spring.mail.username=66fd8b2e293b76
++spring.mail.password=80d35a7fa2bf70
++spring.mail.protocol=smtp
++
++#SMTP
++#Host:smtp.mailtrap.io
++#Port:25 or 465 or 587 or 2525
++#Username:66fd8b2e293b76
++#Password:80d35a7fa2bf70
++#Auth:PLAIN, LOGIN and CRAM-MD5
++#TLS:Optional (STARTTLS on all ports)
++############ JWT Properties #####################
++jwt.expiration.time=900000
++
++spring.security.oauth2.client.registration.google.client-id=743035082551-dhoskdn74km5r944b9ujuiikmkd8dbpt.apps.googleusercontent.com
++spring.security.oauth2.client.registration.google.client-secret=l42RXVbmfuNe9mu9qJnVNayz
++spring.security.oauth2.client.registration.google.authorization-grant-type=authorization_code
++spring.security.oauth2.client.registration.google.redirect-uri={baseUrl}/login/oath2/code/google
++#spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oath2/code/google
++spring.security.oauth2.client.registration.google.scope=email,profile
+\ No newline at end of file
+Index: src/main/resources/templates/mailTemplate.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/templates/mailTemplate.html b/src/main/resources/templates/mailTemplate.html
+new file mode 100644
+--- /dev/null	(date 1606709435848)
++++ b/src/main/resources/templates/mailTemplate.html	(date 1606709435848)
+@@ -0,0 +1,7 @@
++<!DOCTYPE html>
++<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
++<head></head>
++<body>
++<span th:text="${message}"></span>
++</body>
++</html>
+\ No newline at end of file
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+new file mode 100644
+--- /dev/null	(date 1607199143104)
++++ b/pom.xml	(date 1607199143104)
+@@ -0,0 +1,178 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
++    <modelVersion>4.0.0</modelVersion>
++    <parent>
++        <groupId>org.springframework.boot</groupId>
++        <artifactId>spring-boot-starter-parent</artifactId>
++        <version>2.3.6.RELEASE</version>
++        <relativePath/> <!-- lookup parent from repository -->
++    </parent>
++    <groupId>com.giventa.apps</groupId>
++    <artifactId>spring-oauth2</artifactId>
++    <version>0.0.1-SNAPSHOT</version>
++    <name>spring-oauth2</name>
++    <description>Demo project for Spring Boot and Oauth2</description>
++
++    <properties>
++        <java.version>1.8</java.version>
++        <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
++    </properties>
++
++    <dependencies>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-data-jpa</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-mail</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-security</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.security</groupId>
++            <artifactId>spring-security-oauth2-client</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-web</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-validation</artifactId>
++        </dependency>
++
++        <dependency>
++            <groupId>mysql</groupId>
++            <artifactId>mysql-connector-java</artifactId>
++            <scope>runtime</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.projectlombok</groupId>
++            <artifactId>lombok</artifactId>
++            <version>1.18.8</version>
++            <scope>compile</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-test</artifactId>
++            <scope>test</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.security</groupId>
++            <artifactId>spring-security-test</artifactId>
++            <scope>test</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-thymeleaf</artifactId>
++        </dependency>
++        <!-- JWT related dependencies-->
++        <dependency>
++            <groupId>io.jsonwebtoken</groupId>
++            <artifactId>jjwt-api</artifactId>
++            <version>0.10.5</version>
++        </dependency>
++        <dependency>
++            <groupId>io.jsonwebtoken</groupId>
++            <artifactId>jjwt-impl</artifactId>
++            <scope>runtime</scope>
++            <version>0.10.5</version>
++        </dependency>
++        <dependency>
++            <groupId>io.jsonwebtoken</groupId>
++            <artifactId>jjwt-jackson</artifactId>
++            <scope>runtime</scope>
++            <version>0.10.5</version>
++        </dependency>
++        <dependency>
++            <groupId>org.mapstruct</groupId>
++            <artifactId>mapstruct</artifactId>
++            <version>${org.mapstruct.version}</version>
++            <scope>compile</scope>
++        </dependency>
++        <!-- Spring Fox Dependencies -->
++        <dependency>
++            <groupId>io.springfox</groupId>
++            <artifactId>springfox-swagger2</artifactId>
++            <version>2.9.2</version>
++        </dependency>
++        <dependency>
++            <groupId>io.springfox</groupId>
++            <artifactId>springfox-swagger-ui</artifactId>
++            <version>2.9.2</version>
++        </dependency>
++        <!-- For Displaying time as Relative Time Ago ("Posted 1 Day ago"),
++         as this is a Kotlin library, we also need Kotlin runtime libraries-->
++        <dependency>
++            <groupId>com.github.marlonlom</groupId>
++            <artifactId>timeago</artifactId>
++            <version>4.0.1</version>
++        </dependency>
++        <dependency>
++            <groupId>org.jetbrains.kotlin</groupId>
++            <artifactId>kotlin-stdlib-jdk8</artifactId>
++            <version>${kotlin.version}</version>
++        </dependency>
++        <dependency>
++            <groupId>org.jetbrains.kotlin</groupId>
++            <artifactId>kotlin-test-junit</artifactId>
++            <version>${kotlin.version}</version>
++            <scope>test</scope>
++        </dependency>
++    </dependencies>
++
++    <build>
++        <plugins>
++            <plugin>
++                <groupId>org.springframework.boot</groupId>
++                <artifactId>spring-boot-maven-plugin</artifactId>
++            </plugin>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-compiler-plugin</artifactId>
++                <version>3.5.1</version> <!-- or newer version -->
++                <configuration>
++                    <source>1.8</source> <!-- depending on your project -->
++                    <target>1.8</target> <!-- depending on your project -->
++                    <annotationProcessorPaths>
++                        <path>
++                            <groupId>org.mapstruct</groupId>
++                            <artifactId>mapstruct-processor</artifactId>
++                            <version>${org.mapstruct.version}</version>
++                        </path>
++                        <path>
++                            <groupId>org.projectlombok</groupId>
++                            <artifactId>lombok</artifactId>
++                            <version>1.18.8</version>
++                        </path>
++                    </annotationProcessorPaths>
++                </configuration>
++            </plugin>
++            <plugin>
++                <groupId>org.jetbrains.kotlin</groupId>
++                <artifactId>kotlin-maven-plugin</artifactId>
++                <version>${kotlin.version}</version>
++                <executions>
++                    <execution>
++                        <id>compile</id>
++                        <phase>process-sources</phase>
++                        <goals>
++                            <goal>compile</goal>
++                        </goals>
++                        <configuration>
++                            <sourceDirs>
++                                <source>src/main/java</source>
++                                <source>target/generated-sources/annotations</source>
++                            </sourceDirs>
++                        </configuration>
++                    </execution>
++                </executions>
++            </plugin>
++        </plugins>
++    </build>
++
++</project>
+\ No newline at end of file
+Index: src/test/java/com/programming/techie/springredditclone/SpringRedditCloneApplicationTests.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/com/programming/techie/springredditclone/SpringRedditCloneApplicationTests.java b/src/test/java/com/programming/techie/springredditclone/SpringRedditCloneApplicationTests.java
+new file mode 100644
+--- /dev/null	(date 1606709435853)
++++ b/src/test/java/com/programming/techie/springredditclone/SpringRedditCloneApplicationTests.java	(date 1606709435853)
+@@ -0,0 +1,16 @@
++package com.programming.techie.springredditclone;
++
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.springframework.boot.test.context.SpringBootTest;
++import org.springframework.test.context.junit4.SpringRunner;
++
++@RunWith(SpringRunner.class)
++@SpringBootTest
++public class SpringRedditCloneApplicationTests {
++
++	@Test
++	public void contextLoads() {
++	}
++
++}
+Index: .mvn/wrapper/maven-wrapper.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+diff --git a/.mvn/wrapper/maven-wrapper.properties b/.mvn/wrapper/maven-wrapper.properties
+new file mode 100644
+--- /dev/null	(date 1606709435711)
++++ b/.mvn/wrapper/maven-wrapper.properties	(date 1606709435711)
+@@ -0,0 +1,1 @@
++distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.6.0/apache-maven-3.6.0-bin.zip
+Index: src/main/java/com/programming/techie/springredditclone/SpringRedditCloneApplication.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/SpringRedditCloneApplication.java b/src/main/java/com/programming/techie/springredditclone/SpringRedditCloneApplication.java
+new file mode 100644
+--- /dev/null	(date 1606709435725)
++++ b/src/main/java/com/programming/techie/springredditclone/SpringRedditCloneApplication.java	(date 1606709435725)
+@@ -0,0 +1,18 @@
++package com.programming.techie.springredditclone;
++
++import com.programming.techie.springredditclone.config.SwaggerConfiguration;
++import org.springframework.boot.SpringApplication;
++import org.springframework.boot.autoconfigure.SpringBootApplication;
++import org.springframework.context.annotation.Import;
++import org.springframework.scheduling.annotation.EnableAsync;
++
++@SpringBootApplication
++@EnableAsync
++@Import(SwaggerConfiguration.class)
++public class SpringRedditCloneApplication {
++
++    public static void main(String[] args) {
++        SpringApplication.run(com.programming.techie.springredditclone.SpringRedditCloneApplication.class, args);
++    }
++
++}
+Index: .mvn/extensions.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.mvn/extensions.xml b/.mvn/extensions.xml
+new file mode 100644
+--- /dev/null	(date 1606710258922)
++++ b/.mvn/extensions.xml	(date 1606710258922)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<extensions>
++    <extension>
++        <groupId>com.gradle</groupId>
++        <artifactId>gradle-enterprise-maven-extension</artifactId>
++        <version>1.7.2</version>
++    </extension>
++</extensions>
+Index: src/main/java/com/programming/techie/springredditclone/dto/LogoutRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/LogoutRequest.java b/src/main/java/com/programming/techie/springredditclone/dto/LogoutRequest.java
+new file mode 100644
+--- /dev/null	(date 1606709435751)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/LogoutRequest.java	(date 1606709435751)
+@@ -0,0 +1,15 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.validation.constraints.NotBlank;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class LogoutRequest {
++    @NotBlank
++    private String refreshToken;
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/LoginRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/LoginRequest.java b/src/main/java/com/programming/techie/springredditclone/dto/LoginRequest.java
+new file mode 100644
+--- /dev/null	(date 1606709435749)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/LoginRequest.java	(date 1606709435749)
+@@ -0,0 +1,14 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class LoginRequest {
++
++    private String username;
++    private String password;
++}
+Index: .mvn/.gradle-enterprise/gradle-enterprise-workspace-id
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.mvn/.gradle-enterprise/gradle-enterprise-workspace-id b/.mvn/.gradle-enterprise/gradle-enterprise-workspace-id
+new file mode 100644
+--- /dev/null	(date 1606710996864)
++++ b/.mvn/.gradle-enterprise/gradle-enterprise-workspace-id	(date 1606710996864)
+@@ -0,0 +1,1 @@
++fh3xsdoswrbrphdzak446cxw4i
+Index: src/main/java/com/programming/techie/springredditclone/dto/CommentsDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/CommentsDto.java b/src/main/java/com/programming/techie/springredditclone/dto/CommentsDto.java
+new file mode 100644
+--- /dev/null	(date 1606709435748)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/CommentsDto.java	(date 1606709435748)
+@@ -0,0 +1,18 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import java.time.Instant;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class CommentsDto {
++    private Long id;
++    private Long postId;
++    private Instant createdDate;
++    private String text;
++    private String userName;
++}
+Index: .mvn/wrapper/MavenWrapperDownloader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.mvn/wrapper/MavenWrapperDownloader.java b/.mvn/wrapper/MavenWrapperDownloader.java
+new file mode 100644
+--- /dev/null	(date 1606709435704)
++++ b/.mvn/wrapper/MavenWrapperDownloader.java	(date 1606709435704)
+@@ -0,0 +1,114 @@
++/*
++Licensed to the Apache Software Foundation (ASF) under one
++or more contributor license agreements.  See the NOTICE file
++distributed with this work for additional information
++regarding copyright ownership.  The ASF licenses this file
++to you under the Apache License, Version 2.0 (the
++"License"); you may not use this file except in compliance
++with the License.  You may obtain a copy of the License at
++
++  https://www.apache.org/licenses/LICENSE-2.0
++
++Unless required by applicable law or agreed to in writing,
++software distributed under the License is distributed on an
++"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++KIND, either express or implied.  See the License for the
++specific language governing permissions and limitations
++under the License.
++*/
++
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.FileOutputStream;
++import java.io.IOException;
++import java.net.URL;
++import java.nio.channels.Channels;
++import java.nio.channels.ReadableByteChannel;
++import java.util.Properties;
++
++public class MavenWrapperDownloader {
++
++    /**
++     * Default URL to download the maven-wrapper.jar from, if no 'downloadUrl' is provided.
++     */
++    private static final String DEFAULT_DOWNLOAD_URL =
++            "https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.4.2/maven-wrapper-0.4.2.jar";
++
++    /**
++     * Path to the maven-wrapper.properties file, which might contain a downloadUrl property to
++     * use instead of the default one.
++     */
++    private static final String MAVEN_WRAPPER_PROPERTIES_PATH =
++            ".mvn/wrapper/maven-wrapper.properties";
++
++    /**
++     * Path where the maven-wrapper.jar will be saved to.
++     */
++    private static final String MAVEN_WRAPPER_JAR_PATH =
++            ".mvn/wrapper/maven-wrapper.jar";
++
++    /**
++     * Name of the property which should be used to override the default download url for the wrapper.
++     */
++    private static final String PROPERTY_NAME_WRAPPER_URL = "wrapperUrl";
++
++    public static void main(String args[]) {
++        System.out.println("- Downloader started");
++        File baseDirectory = new File(args[0]);
++        System.out.println("- Using base directory: " + baseDirectory.getAbsolutePath());
++
++        // If the maven-wrapper.properties exists, read it and check if it contains a custom
++        // wrapperUrl parameter.
++        File mavenWrapperPropertyFile = new File(baseDirectory, MAVEN_WRAPPER_PROPERTIES_PATH);
++        String url = DEFAULT_DOWNLOAD_URL;
++        if(mavenWrapperPropertyFile.exists()) {
++            FileInputStream mavenWrapperPropertyFileInputStream = null;
++            try {
++                mavenWrapperPropertyFileInputStream = new FileInputStream(mavenWrapperPropertyFile);
++                Properties mavenWrapperProperties = new Properties();
++                mavenWrapperProperties.load(mavenWrapperPropertyFileInputStream);
++                url = mavenWrapperProperties.getProperty(PROPERTY_NAME_WRAPPER_URL, url);
++            } catch (IOException e) {
++                System.out.println("- ERROR loading '" + MAVEN_WRAPPER_PROPERTIES_PATH + "'");
++            } finally {
++                try {
++                    if(mavenWrapperPropertyFileInputStream != null) {
++                        mavenWrapperPropertyFileInputStream.close();
++                    }
++                } catch (IOException e) {
++                    // Ignore ...
++                }
++            }
++        }
++        System.out.println("- Downloading from: : " + url);
++
++        File outputFile = new File(baseDirectory.getAbsolutePath(), MAVEN_WRAPPER_JAR_PATH);
++        if(!outputFile.getParentFile().exists()) {
++            if(!outputFile.getParentFile().mkdirs()) {
++                System.out.println(
++                        "- ERROR creating output direcrory '" + outputFile.getParentFile().getAbsolutePath() + "'");
++            }
++        }
++        System.out.println("- Downloading to: " + outputFile.getAbsolutePath());
++        try {
++            downloadFileFromURL(url, outputFile);
++            System.out.println("Done");
++            System.exit(0);
++        } catch (Throwable e) {
++            System.out.println("- Error downloading");
++            e.printStackTrace();
++            System.exit(1);
++        }
++    }
++
++    private static void downloadFileFromURL(String urlString, File destination) throws Exception {
++        URL website = new URL(urlString);
++        ReadableByteChannel rbc;
++        rbc = Channels.newChannel(website.openStream());
++        FileOutputStream fos = new FileOutputStream(destination);
++        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
++        fos.close();
++        rbc.close();
++    }
++
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/AuthenticationResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/AuthenticationResponse.java b/src/main/java/com/programming/techie/springredditclone/dto/AuthenticationResponse.java
+new file mode 100644
+--- /dev/null	(date 1606709435746)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/AuthenticationResponse.java	(date 1606709435746)
+@@ -0,0 +1,19 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Builder;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import java.time.Instant;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Builder
++public class AuthenticationResponse {
++    private String authenticationToken;
++    private String refreshToken;
++    private Instant expiresAt;
++    private String username;
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/RegisterRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/RegisterRequest.java b/src/main/java/com/programming/techie/springredditclone/dto/RegisterRequest.java
+new file mode 100644
+--- /dev/null	(date 1606709435757)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/RegisterRequest.java	(date 1606709435757)
+@@ -0,0 +1,15 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class RegisterRequest {
++    private String email;
++    private String username;
++    private String password;
++
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/RefreshTokenRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/RefreshTokenRequest.java b/src/main/java/com/programming/techie/springredditclone/dto/RefreshTokenRequest.java
+new file mode 100644
+--- /dev/null	(date 1606709435756)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/RefreshTokenRequest.java	(date 1606709435756)
+@@ -0,0 +1,16 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.validation.constraints.NotBlank;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class RefreshTokenRequest {
++    @NotBlank
++    private String refreshToken;
++    private String username;
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/PostResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/PostResponse.java b/src/main/java/com/programming/techie/springredditclone/dto/PostResponse.java
+new file mode 100644
+--- /dev/null	(date 1606709435754)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/PostResponse.java	(date 1606709435754)
+@@ -0,0 +1,22 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class PostResponse {
++    private Long id;
++    private String postName;
++    private String url;
++    private String description;
++    private String userName;
++    private String subredditName;
++    private Integer voteCount;
++    private Integer commentCount;
++    private String duration;
++    private boolean upVote;
++    private boolean downVote;
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/PostRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/PostRequest.java b/src/main/java/com/programming/techie/springredditclone/dto/PostRequest.java
+new file mode 100644
+--- /dev/null	(date 1606709435753)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/PostRequest.java	(date 1606709435753)
+@@ -0,0 +1,16 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class PostRequest {
++    private Long postId;
++    private String subredditName;
++    private String postName;
++    private String url;
++    private String description;
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/NotificationEmail.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/NotificationEmail.java b/src/main/java/com/programming/techie/springredditclone/model/NotificationEmail.java
+new file mode 100644
+--- /dev/null	(date 1606709435777)
++++ b/src/main/java/com/programming/techie/springredditclone/model/NotificationEmail.java	(date 1606709435777)
+@@ -0,0 +1,14 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class NotificationEmail {
++    private String subject;
++    private String recipient;
++    private String body;
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/Comment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/Comment.java b/src/main/java/com/programming/techie/springredditclone/model/Comment.java
+new file mode 100644
+--- /dev/null	(date 1606709435776)
++++ b/src/main/java/com/programming/techie/springredditclone/model/Comment.java	(date 1606709435776)
+@@ -0,0 +1,31 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.persistence.*;
++import javax.validation.constraints.NotEmpty;
++import java.time.Instant;
++
++import static javax.persistence.FetchType.LAZY;
++import static javax.persistence.GenerationType.IDENTITY;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Entity
++public class Comment {
++    @Id
++    @GeneratedValue(strategy = IDENTITY)
++    private Long id;
++    @NotEmpty
++    private String text;
++    @ManyToOne(fetch = LAZY)
++    @JoinColumn(name = "postId", referencedColumnName = "postId")
++    private Post post;
++    private Instant createdDate;
++    @ManyToOne(fetch = LAZY)
++    @JoinColumn(name = "userId", referencedColumnName = "userId")
++    private User user;
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/VoteDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/VoteDto.java b/src/main/java/com/programming/techie/springredditclone/dto/VoteDto.java
+new file mode 100644
+--- /dev/null	(date 1606709435761)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/VoteDto.java	(date 1606709435761)
+@@ -0,0 +1,14 @@
++package com.programming.techie.springredditclone.dto;
++
++import com.programming.techie.springredditclone.model.VoteType;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++public class VoteDto {
++    private VoteType voteType;
++    private Long postId;
++}
+Index: src/main/java/com/programming/techie/springredditclone/dto/SubredditDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/dto/SubredditDto.java b/src/main/java/com/programming/techie/springredditclone/dto/SubredditDto.java
+new file mode 100644
+--- /dev/null	(date 1606709435759)
++++ b/src/main/java/com/programming/techie/springredditclone/dto/SubredditDto.java	(date 1606709435759)
+@@ -0,0 +1,17 @@
++package com.programming.techie.springredditclone.dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Builder;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Builder
++public class SubredditDto {
++    private Long id;
++    private String name;
++    private String description;
++    private Integer numberOfPosts;
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/User.java b/src/main/java/com/programming/techie/springredditclone/model/User.java
+new file mode 100644
+--- /dev/null	(date 1606709435783)
++++ b/src/main/java/com/programming/techie/springredditclone/model/User.java	(date 1606709435783)
+@@ -0,0 +1,34 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.persistence.Entity;
++import javax.persistence.GeneratedValue;
++import javax.persistence.Id;
++import javax.validation.constraints.Email;
++import javax.validation.constraints.NotBlank;
++import javax.validation.constraints.NotEmpty;
++import java.time.Instant;
++
++import static javax.persistence.GenerationType.IDENTITY;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Entity
++public class User {
++    @Id
++    @GeneratedValue(strategy = IDENTITY)
++    private Long userId;
++    @NotBlank(message = "Username is required")
++    private String username;
++    @NotBlank(message = "Password is required")
++    private String password;
++    @Email
++    @NotEmpty(message = "Email is required")
++    private String email;
++    private Instant created;
++    private boolean enabled;
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/Subreddit.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/Subreddit.java b/src/main/java/com/programming/techie/springredditclone/model/Subreddit.java
+new file mode 100644
+--- /dev/null	(date 1606709435781)
++++ b/src/main/java/com/programming/techie/springredditclone/model/Subreddit.java	(date 1606709435781)
+@@ -0,0 +1,34 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Builder;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.persistence.*;
++import javax.validation.constraints.NotBlank;
++import java.time.Instant;
++import java.util.List;
++
++import static javax.persistence.FetchType.LAZY;
++import static javax.persistence.GenerationType.IDENTITY;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Entity
++@Builder
++public class Subreddit {
++    @Id
++    @GeneratedValue(strategy = IDENTITY)
++    private Long id;
++    @NotBlank(message = "Community name is required")
++    private String name;
++    @NotBlank(message = "Description is required")
++    private String description;
++    @OneToMany(fetch = LAZY)
++    private List<Post> posts;
++    private Instant createdDate;
++    @ManyToOne(fetch = LAZY)
++    private User user;
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/RefreshToken.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/RefreshToken.java b/src/main/java/com/programming/techie/springredditclone/model/RefreshToken.java
+new file mode 100644
+--- /dev/null	(date 1606709435780)
++++ b/src/main/java/com/programming/techie/springredditclone/model/RefreshToken.java	(date 1606709435780)
+@@ -0,0 +1,23 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.persistence.Entity;
++import javax.persistence.GeneratedValue;
++import javax.persistence.GenerationType;
++import javax.persistence.Id;
++import java.time.Instant;
++
++@Data
++@Entity
++@AllArgsConstructor
++@NoArgsConstructor
++public class RefreshToken {
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    private Long id;
++    private String token;
++    private Instant createdDate;
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/Post.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/Post.java b/src/main/java/com/programming/techie/springredditclone/model/Post.java
+new file mode 100644
+--- /dev/null	(date 1606709435779)
++++ b/src/main/java/com/programming/techie/springredditclone/model/Post.java	(date 1606709435779)
+@@ -0,0 +1,40 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Builder;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++import org.springframework.lang.Nullable;
++
++import javax.persistence.*;
++import javax.validation.constraints.NotBlank;
++import java.time.Instant;
++
++import static javax.persistence.FetchType.LAZY;
++import static javax.persistence.GenerationType.IDENTITY;
++
++@Data
++@Entity
++@Builder
++@AllArgsConstructor
++@NoArgsConstructor
++public class Post {
++    @Id
++    @GeneratedValue(strategy = IDENTITY)
++    private Long postId;
++    @NotBlank(message = "Post Name cannot be empty or Null")
++    private String postName;
++    @Nullable
++    private String url;
++    @Nullable
++    @Lob
++    private String description;
++    private Integer voteCount = 0;
++    @ManyToOne(fetch = LAZY)
++    @JoinColumn(name = "userId", referencedColumnName = "userId")
++    private User user;
++    private Instant createdDate;
++    @ManyToOne(fetch = LAZY)
++    @JoinColumn(name = "id", referencedColumnName = "id")
++    private Subreddit subreddit;
++}
+Index: src/main/java/com/programming/techie/springredditclone/config/SecurityConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/config/SecurityConfig.java b/src/main/java/com/programming/techie/springredditclone/config/SecurityConfig.java
+new file mode 100644
+--- /dev/null	(date 1606709435728)
++++ b/src/main/java/com/programming/techie/springredditclone/config/SecurityConfig.java	(date 1606709435728)
+@@ -0,0 +1,68 @@
++package com.programming.techie.springredditclone.config;
++
++import com.programming.techie.springredditclone.security.JwtAuthenticationFilter;
++import lombok.AllArgsConstructor;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.context.annotation.Bean;
++import org.springframework.http.HttpMethod;
++import org.springframework.security.authentication.AuthenticationManager;
++import org.springframework.security.config.BeanIds;
++import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
++import org.springframework.security.config.annotation.web.builders.HttpSecurity;
++import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
++import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
++import org.springframework.security.core.userdetails.UserDetailsService;
++import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
++import org.springframework.security.crypto.password.PasswordEncoder;
++import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
++
++@EnableWebSecurity
++@AllArgsConstructor
++public class SecurityConfig extends WebSecurityConfigurerAdapter {
++
++    private final UserDetailsService userDetailsService;
++    private final JwtAuthenticationFilter jwtAuthenticationFilter;
++
++    @Bean(BeanIds.AUTHENTICATION_MANAGER)
++    @Override
++    public AuthenticationManager authenticationManagerBean() throws Exception {
++        return super.authenticationManagerBean();
++    }
++
++    @Override
++    public void configure(HttpSecurity httpSecurity) throws Exception {
++        httpSecurity.cors().and()
++                .csrf().disable()
++                .authorizeRequests()
++                .antMatchers("/api/auth/**")
++                .permitAll()
++                .antMatchers(HttpMethod.GET, "/api/subreddit")
++                .permitAll()
++                .antMatchers(HttpMethod.GET, "/api/posts/")
++                .permitAll()
++                .antMatchers(HttpMethod.GET, "/api/posts/**")
++                .permitAll()
++                .antMatchers("/v2/api-docs",
++                        "/configuration/ui",
++                        "/swagger-resources/**",
++                        "/configuration/security",
++                        "/swagger-ui.html",
++                        "/webjars/**")
++                .permitAll()
++                .anyRequest()
++                .authenticated();
++        httpSecurity.addFilterBefore(jwtAuthenticationFilter,
++                UsernamePasswordAuthenticationFilter.class);
++    }
++
++    @Autowired
++    public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
++        authenticationManagerBuilder.userDetailsService(userDetailsService)
++                .passwordEncoder(passwordEncoder());
++    }
++
++    @Bean
++    PasswordEncoder passwordEncoder() {
++        return new BCryptPasswordEncoder();
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/VoteType.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/VoteType.java b/src/main/java/com/programming/techie/springredditclone/model/VoteType.java
+new file mode 100644
+--- /dev/null	(date 1606709435788)
++++ b/src/main/java/com/programming/techie/springredditclone/model/VoteType.java	(date 1606709435788)
+@@ -0,0 +1,26 @@
++package com.programming.techie.springredditclone.model;
++
++import com.programming.techie.springredditclone.exceptions.SpringRedditException;
++
++import java.util.Arrays;
++
++public enum VoteType {
++    UPVOTE(1), DOWNVOTE(-1),
++    ;
++
++    private int direction;
++
++    VoteType(int direction) {
++    }
++
++    public static VoteType lookup(Integer direction) {
++        return Arrays.stream(VoteType.values())
++                .filter(value -> value.getDirection().equals(direction))
++                .findAny()
++                .orElseThrow(() -> new SpringRedditException("Vote not found"));
++    }
++
++    public Integer getDirection() {
++        return direction;
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/Vote.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/Vote.java b/src/main/java/com/programming/techie/springredditclone/model/Vote.java
+new file mode 100644
+--- /dev/null	(date 1606709435786)
++++ b/src/main/java/com/programming/techie/springredditclone/model/Vote.java	(date 1606709435786)
+@@ -0,0 +1,31 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Builder;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.persistence.*;
++import javax.validation.constraints.NotNull;
++
++import static javax.persistence.FetchType.LAZY;
++import static javax.persistence.GenerationType.IDENTITY;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Entity
++@Builder
++public class Vote {
++    @Id
++    @GeneratedValue(strategy = IDENTITY)
++    private Long voteId;
++    private VoteType voteType;
++    @NotNull
++    @ManyToOne(fetch = LAZY)
++    @JoinColumn(name = "postId", referencedColumnName = "postId")
++    private Post post;
++    @ManyToOne(fetch = LAZY)
++    @JoinColumn(name = "userId", referencedColumnName = "userId")
++    private User user;
++}
+Index: src/main/java/com/programming/techie/springredditclone/model/VerificationToken.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/model/VerificationToken.java b/src/main/java/com/programming/techie/springredditclone/model/VerificationToken.java
+new file mode 100644
+--- /dev/null	(date 1606709435785)
++++ b/src/main/java/com/programming/techie/springredditclone/model/VerificationToken.java	(date 1606709435785)
+@@ -0,0 +1,27 @@
++package com.programming.techie.springredditclone.model;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++import javax.persistence.*;
++import java.time.Instant;
++
++import static javax.persistence.FetchType.LAZY;
++import static javax.persistence.GenerationType.IDENTITY;
++
++@Data
++@AllArgsConstructor
++@NoArgsConstructor
++@Entity
++@Table(name = "token")
++public class VerificationToken {
++
++    @Id
++    @GeneratedValue(strategy = IDENTITY)
++    private Long id;
++    private String token;
++    @OneToOne(fetch = LAZY)
++    private User user;
++    private Instant expiryDate;
++}
+Index: src/main/java/com/programming/techie/springredditclone/mapper/PostMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/mapper/PostMapper.java b/src/main/java/com/programming/techie/springredditclone/mapper/PostMapper.java
+new file mode 100644
+--- /dev/null	(date 1606709435772)
++++ b/src/main/java/com/programming/techie/springredditclone/mapper/PostMapper.java	(date 1606709435772)
+@@ -0,0 +1,73 @@
++package com.programming.techie.springredditclone.mapper;
++
++import com.github.marlonlom.utilities.timeago.TimeAgo;
++import com.programming.techie.springredditclone.dto.PostRequest;
++import com.programming.techie.springredditclone.dto.PostResponse;
++import com.programming.techie.springredditclone.model.*;
++import com.programming.techie.springredditclone.repository.CommentRepository;
++import com.programming.techie.springredditclone.repository.VoteRepository;
++import com.programming.techie.springredditclone.service.AuthService;
++import org.mapstruct.Mapper;
++import org.mapstruct.Mapping;
++import org.springframework.beans.factory.annotation.Autowired;
++
++import java.util.Optional;
++
++import static com.programming.techie.springredditclone.model.VoteType.DOWNVOTE;
++import static com.programming.techie.springredditclone.model.VoteType.UPVOTE;
++
++@Mapper(componentModel = "spring")
++public abstract class PostMapper {
++
++    @Autowired
++    private CommentRepository commentRepository;
++    @Autowired
++    private VoteRepository voteRepository;
++    @Autowired
++    private AuthService authService;
++
++
++    @Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
++    @Mapping(target = "description", source = "postRequest.description")
++    @Mapping(target = "subreddit", source = "subreddit")
++    @Mapping(target = "voteCount", constant = "0")
++    @Mapping(target = "user", source = "user")
++    public abstract Post map(PostRequest postRequest, Subreddit subreddit, User user);
++
++    @Mapping(target = "id", source = "postId")
++    @Mapping(target = "subredditName", source = "subreddit.name")
++    @Mapping(target = "userName", source = "user.username")
++    @Mapping(target = "commentCount", expression = "java(commentCount(post))")
++    @Mapping(target = "duration", expression = "java(getDuration(post))")
++    @Mapping(target = "upVote", expression = "java(isPostUpVoted(post))")
++    @Mapping(target = "downVote", expression = "java(isPostDownVoted(post))")
++    public abstract PostResponse mapToDto(Post post);
++
++    Integer commentCount(Post post) {
++        return commentRepository.findByPost(post).size();
++    }
++
++    String getDuration(Post post) {
++        return TimeAgo.using(post.getCreatedDate().toEpochMilli());
++    }
++
++    boolean isPostUpVoted(Post post) {
++        return checkVoteType(post, UPVOTE);
++    }
++
++    boolean isPostDownVoted(Post post) {
++        return checkVoteType(post, DOWNVOTE);
++    }
++
++    private boolean checkVoteType(Post post, VoteType voteType) {
++        if (authService.isLoggedIn()) {
++            Optional<Vote> voteForPostByUser =
++                    voteRepository.findTopByPostAndUserOrderByVoteIdDesc(post,
++                            authService.getCurrentUser());
++            return voteForPostByUser.filter(vote -> vote.getVoteType().equals(voteType))
++                    .isPresent();
++        }
++        return false;
++    }
++
++}
+\ No newline at end of file
+Index: src/main/java/com/programming/techie/springredditclone/mapper/CommentMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/mapper/CommentMapper.java b/src/main/java/com/programming/techie/springredditclone/mapper/CommentMapper.java
+new file mode 100644
+--- /dev/null	(date 1606709435770)
++++ b/src/main/java/com/programming/techie/springredditclone/mapper/CommentMapper.java	(date 1606709435770)
+@@ -0,0 +1,22 @@
++package com.programming.techie.springredditclone.mapper;
++
++import com.programming.techie.springredditclone.dto.CommentsDto;
++import com.programming.techie.springredditclone.model.Comment;
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.User;
++import org.mapstruct.Mapper;
++import org.mapstruct.Mapping;
++
++@Mapper(componentModel = "spring")
++public interface CommentMapper {
++    @Mapping(target = "id", ignore = true)
++    @Mapping(target = "text", source = "commentsDto.text")
++    @Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
++    @Mapping(target = "post", source = "post")
++    @Mapping(target = "user", source = "user")
++    Comment map(CommentsDto commentsDto, Post post, User user);
++
++    @Mapping(target = "postId", expression = "java(comment.getPost().getPostId())")
++    @Mapping(target = "userName", expression = "java(comment.getUser().getUsername())")
++    CommentsDto mapToDto(Comment comment);
++}
+\ No newline at end of file
+Index: src/main/java/com/programming/techie/springredditclone/config/WebConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/config/WebConfig.java b/src/main/java/com/programming/techie/springredditclone/config/WebConfig.java
+new file mode 100644
+--- /dev/null	(date 1606709435733)
++++ b/src/main/java/com/programming/techie/springredditclone/config/WebConfig.java	(date 1606709435733)
+@@ -0,0 +1,32 @@
++package com.programming.techie.springredditclone.config;
++
++import org.springframework.context.annotation.Configuration;
++import org.springframework.web.servlet.config.annotation.CorsRegistry;
++import org.springframework.web.servlet.config.annotation.EnableWebMvc;
++import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
++import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
++
++@Configuration
++@EnableWebMvc
++public class WebConfig implements WebMvcConfigurer {
++
++    @Override
++    public void addCorsMappings(CorsRegistry corsRegistry) {
++        corsRegistry.addMapping("/**")
++                .allowedOrigins("*")
++                .allowedMethods("*")
++                .maxAge(3600L)
++                .allowedHeaders("*")
++                .exposedHeaders("Authorization")
++                .allowCredentials(true);
++    }
++
++    @Override
++    public void addResourceHandlers(ResourceHandlerRegistry registry) {
++        registry.addResourceHandler("swagger-ui.html")
++                .addResourceLocations("classpath:/META-INF/resources/");
++
++        registry.addResourceHandler("/webjars/**")
++                .addResourceLocations("classpath:/META-INF/resources/webjars/");
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/config/SwaggerConfiguration.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/config/SwaggerConfiguration.java b/src/main/java/com/programming/techie/springredditclone/config/SwaggerConfiguration.java
+new file mode 100644
+--- /dev/null	(date 1606709435731)
++++ b/src/main/java/com/programming/techie/springredditclone/config/SwaggerConfiguration.java	(date 1606709435731)
+@@ -0,0 +1,36 @@
++package com.programming.techie.springredditclone.config;
++
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import springfox.documentation.builders.ApiInfoBuilder;
++import springfox.documentation.builders.PathSelectors;
++import springfox.documentation.builders.RequestHandlerSelectors;
++import springfox.documentation.service.ApiInfo;
++import springfox.documentation.service.Contact;
++import springfox.documentation.spi.DocumentationType;
++import springfox.documentation.spring.web.plugins.Docket;
++import springfox.documentation.swagger2.annotations.EnableSwagger2;
++
++@Configuration
++@EnableSwagger2
++public class SwaggerConfiguration {
++    @Bean
++    public Docket redditCloneApi() {
++        return new Docket(DocumentationType.SWAGGER_2)
++                .select()
++                .apis(RequestHandlerSelectors.any())
++                .paths(PathSelectors.any())
++                .build()
++                .apiInfo(getApiInfo());
++    }
++
++    private ApiInfo getApiInfo() {
++        return new ApiInfoBuilder()
++                .title("Reddit Clone API")
++                .version("1.0")
++                .description("API for Reddit Clone Application")
++                .contact(new Contact("Sai Upadhyayula", "http://programmingtechie.com", "xyz@email.com"))
++                .license("Apache License Version 2.0")
++                .build();
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/service/MailContentBuilder.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/MailContentBuilder.java b/src/main/java/com/programming/techie/springredditclone/service/MailContentBuilder.java
+new file mode 100644
+--- /dev/null	(date 1606709435813)
++++ b/src/main/java/com/programming/techie/springredditclone/service/MailContentBuilder.java	(date 1606709435813)
+@@ -0,0 +1,19 @@
++package com.programming.techie.springredditclone.service;
++
++import lombok.AllArgsConstructor;
++import org.springframework.stereotype.Service;
++import org.thymeleaf.TemplateEngine;
++import org.thymeleaf.context.Context;
++
++@Service
++@AllArgsConstructor
++public class MailContentBuilder {
++
++    private final TemplateEngine templateEngine;
++
++    public String build(String message) {
++        Context context = new Context();
++        context.setVariable("message", message);
++        return templateEngine.process("mailTemplate", context);
++    }
++}
+\ No newline at end of file
+Index: src/main/java/com/programming/techie/springredditclone/service/CommentService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/CommentService.java b/src/main/java/com/programming/techie/springredditclone/service/CommentService.java
+new file mode 100644
+--- /dev/null	(date 1606709435812)
++++ b/src/main/java/com/programming/techie/springredditclone/service/CommentService.java	(date 1606709435812)
+@@ -0,0 +1,62 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.dto.CommentsDto;
++import com.programming.techie.springredditclone.exceptions.PostNotFoundException;
++import com.programming.techie.springredditclone.mapper.CommentMapper;
++import com.programming.techie.springredditclone.model.Comment;
++import com.programming.techie.springredditclone.model.NotificationEmail;
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.User;
++import com.programming.techie.springredditclone.repository.CommentRepository;
++import com.programming.techie.springredditclone.repository.PostRepository;
++import com.programming.techie.springredditclone.repository.UserRepository;
++import lombok.AllArgsConstructor;
++import org.springframework.security.core.userdetails.UsernameNotFoundException;
++import org.springframework.stereotype.Service;
++
++import java.util.List;
++
++import static java.util.stream.Collectors.toList;
++
++@Service
++@AllArgsConstructor
++public class CommentService {
++    private static final String POST_URL = "";
++    private final PostRepository postRepository;
++    private final UserRepository userRepository;
++    private final AuthService authService;
++    private final CommentMapper commentMapper;
++    private final CommentRepository commentRepository;
++    private final MailContentBuilder mailContentBuilder;
++    private final MailService mailService;
++
++    public void save(CommentsDto commentsDto) {
++        Post post = postRepository.findById(commentsDto.getPostId())
++                .orElseThrow(() -> new PostNotFoundException(commentsDto.getPostId().toString()));
++        Comment comment = commentMapper.map(commentsDto, post, authService.getCurrentUser());
++        commentRepository.save(comment);
++
++        String message = mailContentBuilder.build(authService.getCurrentUser() + " posted a comment on your post." + POST_URL);
++        sendCommentNotification(message, post.getUser());
++    }
++
++    private void sendCommentNotification(String message, User user) {
++        mailService.sendMail(new NotificationEmail(user.getUsername() + " Commented on your post", user.getEmail(), message));
++    }
++
++    public List<CommentsDto> getAllCommentsForPost(Long postId) {
++        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId.toString()));
++        return commentRepository.findByPost(post)
++                .stream()
++                .map(commentMapper::mapToDto).collect(toList());
++    }
++
++    public List<CommentsDto> getAllCommentsForUser(String userName) {
++        User user = userRepository.findByUsername(userName)
++                .orElseThrow(() -> new UsernameNotFoundException(userName));
++        return commentRepository.findAllByUser(user)
++                .stream()
++                .map(commentMapper::mapToDto)
++                .collect(toList());
++    }
++}
+Index: src/main/java/com/programming/techie/springredditclone/service/AuthService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/service/AuthService.java b/src/main/java/com/programming/techie/springredditclone/service/AuthService.java
+new file mode 100644
+--- /dev/null	(date 1606709435810)
++++ b/src/main/java/com/programming/techie/springredditclone/service/AuthService.java	(date 1606709435810)
+@@ -0,0 +1,117 @@
++package com.programming.techie.springredditclone.service;
++
++import com.programming.techie.springredditclone.dto.AuthenticationResponse;
++import com.programming.techie.springredditclone.dto.LoginRequest;
++import com.programming.techie.springredditclone.dto.RefreshTokenRequest;
++import com.programming.techie.springredditclone.dto.RegisterRequest;
++import com.programming.techie.springredditclone.exceptions.SpringRedditException;
++import com.programming.techie.springredditclone.model.NotificationEmail;
++import com.programming.techie.springredditclone.model.User;
++import com.programming.techie.springredditclone.model.VerificationToken;
++import com.programming.techie.springredditclone.repository.UserRepository;
++import com.programming.techie.springredditclone.repository.VerificationTokenRepository;
++import com.programming.techie.springredditclone.security.JwtProvider;
++import lombok.AllArgsConstructor;
++import org.springframework.security.authentication.AnonymousAuthenticationToken;
++import org.springframework.security.authentication.AuthenticationManager;
++import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
++import org.springframework.security.core.Authentication;
++import org.springframework.security.core.context.SecurityContextHolder;
++import org.springframework.security.core.userdetails.UsernameNotFoundException;
++import org.springframework.security.crypto.password.PasswordEncoder;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.time.Instant;
++import java.util.Optional;
++import java.util.UUID;
++
++@Service
++@AllArgsConstructor
++@Transactional
++public class AuthService {
++
++    private final PasswordEncoder passwordEncoder;
++    private final UserRepository userRepository;
++    private final VerificationTokenRepository verificationTokenRepository;
++    private final MailService mailService;
++    private final AuthenticationManager authenticationManager;
++    private final JwtProvider jwtProvider;
++    private final RefreshTokenService refreshTokenService;
++
++    public void signup(RegisterRequest registerRequest) {
++        User user = new User();
++        user.setUsername(registerRequest.getUsername());
++        user.setEmail(registerRequest.getEmail());
++        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
++        user.setCreated(Instant.now());
++        user.setEnabled(false);
++
++        userRepository.save(user);
++
++        String token = generateVerificationToken(user);
++        mailService.sendMail(new NotificationEmail("Please Activate your Account",
++                user.getEmail(), "Thank you for signing up to Spring Reddit, " +
++                "please click on the below url to activate your account : " +
++                "http://localhost:8080/api/auth/accountVerification/" + token));
++    }
++
++    @Transactional(readOnly = true)
++    public User getCurrentUser() {
++        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
++                getContext().getAuthentication().getPrincipal();
++        return userRepository.findByUsername(principal.getUsername())
++                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
++    }
++
++    private void fetchUserAndEnable(VerificationToken verificationToken) {
++        String username = verificationToken.getUser().getUsername();
++        User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User not found with name - " + username));
++        user.setEnabled(true);
++        userRepository.save(user);
++    }
++
++    private String generateVerificationToken(User user) {
++        String token = UUID.randomUUID().toString();
++        VerificationToken verificationToken = new VerificationToken();
++        verificationToken.setToken(token);
++        verificationToken.setUser(user);
++
++        verificationTokenRepository.save(verificationToken);
++        return token;
++    }
++
++    public void verifyAccount(String token) {
++        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
++        fetchUserAndEnable(verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token")));
++    }
++
++    public AuthenticationResponse login(LoginRequest loginRequest) {
++        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
++                loginRequest.getPassword()));
++        SecurityContextHolder.getContext().setAuthentication(authenticate);
++        String token = jwtProvider.generateToken(authenticate);
++        return AuthenticationResponse.builder()
++                .authenticationToken(token)
++                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
++                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
++                .username(loginRequest.getUsername())
++                .build();
++    }
++
++    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
++        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
++        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
++        return AuthenticationResponse.builder()
++                .authenticationToken(token)
++                .refreshToken(refreshTokenRequest.getRefreshToken())
++                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
++                .username(refreshTokenRequest.getUsername())
++                .build();
++    }
++
++    public boolean isLoggedIn() {
++        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
++        return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
++    }
++}
+\ No newline at end of file
+Index: src/main/java/com/programming/techie/springredditclone/mapper/SubredditMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/programming/techie/springredditclone/mapper/SubredditMapper.java b/src/main/java/com/programming/techie/springredditclone/mapper/SubredditMapper.java
+new file mode 100644
+--- /dev/null	(date 1606709435774)
++++ b/src/main/java/com/programming/techie/springredditclone/mapper/SubredditMapper.java	(date 1606709435774)
+@@ -0,0 +1,25 @@
++package com.programming.techie.springredditclone.mapper;
++
++import com.programming.techie.springredditclone.dto.SubredditDto;
++import com.programming.techie.springredditclone.model.Post;
++import com.programming.techie.springredditclone.model.Subreddit;
++import org.mapstruct.InheritInverseConfiguration;
++import org.mapstruct.Mapper;
++import org.mapstruct.Mapping;
++
++import java.util.List;
++
++@Mapper(componentModel = "spring")
++public interface SubredditMapper {
++
++    @Mapping(target = "numberOfPosts", expression = "java(mapPosts(subreddit.getPosts()))")
++    SubredditDto mapSubredditToDto(Subreddit subreddit);
++
++    default Integer mapPosts(List<Post> numberOfPosts) {
++        return numberOfPosts.size();
++    }
++
++    @InheritInverseConfiguration
++    @Mapping(target = "posts", ignore = true)
++    Subreddit mapDtoToSubreddit(SubredditDto subredditDto);
++}
