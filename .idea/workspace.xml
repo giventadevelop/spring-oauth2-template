@@ -5,7 +5,74 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5208ec30-b672-4030-bbd1-ce60920c2fb3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/SpringRedditCloneApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/SpringRedditCloneApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/config/WebConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/config/WebConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/AuthController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/CommentsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/CommentsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/PostController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/PostController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/SubredditController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/SubredditController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/VoteController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/controller/VoteController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/AuthenticationResponse$AuthenticationResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/AuthenticationResponse$AuthenticationResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/AuthenticationResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/AuthenticationResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/CommentsDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/CommentsDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/LoginRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/LoginRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/LogoutRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/LogoutRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/PostRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/PostRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/PostResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/PostResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/RefreshTokenRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/RefreshTokenRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/RegisterRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/RegisterRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/SubredditDto$SubredditDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/SubredditDto$SubredditDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/SubredditDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/SubredditDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/VoteDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/dto/VoteDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/exceptions/PostNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/exceptions/PostNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/exceptions/SpringRedditException.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/exceptions/SpringRedditException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/exceptions/SubredditNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/exceptions/SubredditNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/CommentMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/CommentMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/CommentMapperImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/CommentMapperImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/PostMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/PostMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/PostMapperImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/PostMapperImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/SubredditMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/SubredditMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/SubredditMapperImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/mapper/SubredditMapperImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Comment.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Comment.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/NotificationEmail.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/NotificationEmail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Post$PostBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Post$PostBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Post.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Post.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/RefreshToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/RefreshToken.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Subreddit$SubredditBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Subreddit$SubredditBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Subreddit.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Subreddit.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/VerificationToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/VerificationToken.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Vote$VoteBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Vote$VoteBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Vote.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/Vote.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/VoteType.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/model/VoteType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/CommentRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/CommentRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/PostRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/PostRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/RefreshTokenRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/RefreshTokenRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/SubredditRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/SubredditRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/UserRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/VerificationTokenRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/VerificationTokenRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/VoteRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/repository/VoteRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/security/JwtAuthenticationFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/security/JwtAuthenticationFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/security/JwtProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/security/JwtProvider.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/AuthService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/AuthService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/CommentService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/CommentService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/MailContentBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/MailContentBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/MailService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/MailService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/PostService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/PostService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/RefreshTokenService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/RefreshTokenService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/SubredditService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/SubredditService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/UserDetailsServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/UserDetailsServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/VoteService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/programming/techie/springredditclone/service/VoteService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/generated-sources/annotations/com/programming/techie/springredditclone/mapper/CommentMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/generated-sources/annotations/com/programming/techie/springredditclone/mapper/CommentMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/generated-sources/annotations/com/programming/techie/springredditclone/mapper/PostMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/generated-sources/annotations/com/programming/techie/springredditclone/mapper/PostMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/generated-sources/annotations/com/programming/techie/springredditclone/mapper/SubredditMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/target/generated-sources/annotations/com/programming/techie/springredditclone/mapper/SubredditMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/spring-oauth2-0.0.1-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/spring-oauth2-0.0.1-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/spring-oauth2-0.0.1-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/spring-oauth2-0.0.1-SNAPSHOT.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.programming.techie.springredditclone.SpringRedditCloneApplicationTests.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/TEST-com.programming.techie.springredditclone.SpringRedditCloneApplicationTests.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.programming.techie.springredditclone.SpringRedditCloneApplicationTests.txt" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/com.programming.techie.springredditclone.SpringRedditCloneApplicationTests.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +88,10 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -28,17 +99,6 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="SpringRedditCloneApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="spring-oauth2-template" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.programming.techie.springredditclone.SpringRedditCloneApplication" />
@@ -56,11 +116,53 @@
       <option name="presentableId" value="Default" />
       <updated>1607190787982</updated>
       <workItem from="1607190790321" duration="14000" />
-      <workItem from="1607190976047" duration="890000" />
+      <workItem from="1607190976047" duration="1976000" />
+      <workItem from="1607200294329" duration="815000" />
     </task>
+    <task id="LOCAL-00001" summary="initial commit">
+      <created>1607199697466</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1607199697466</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="false" />
+                </map>
+              </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="initial commit" />
   </component>
 </project>
